@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preview — GeckoAI</title>
+  <link rel="stylesheet" href="preview.css" />
+  <link rel="stylesheet" href="../sidepanel/marca.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="ident">
+      <img src="../icons/icon32.png" alt="" class="mark" />
+      <span class="name" id="site-name">Preview</span>
+      <span class="status" id="status"><span class="dot"></span><span id="status-text">Carregando…</span></span>
+    </div>
+    <div class="addr mono" id="addr"></div>
+    <div class="tools">
+      <button id="btn-device" title="Alternar celular/desktop">📱</button>
+      <button id="btn-reload" title="Recarregar">⟳</button>
+      <a id="btn-open" title="Abrir em nova aba" target="_blank" rel="noreferrer">↗</a>
+    </div>
+  </header>
+  <main class="stage" id="stage">
+    <div class="empty" id="empty" hidden>
+      <p>Este projeto ainda não tem um site vinculado.</p>
+      <p class="sub">Volte ao painel do <span data-marca>GeckoAI</span> e clique no botão de preview para conectar.</p>
+    </div>
+    <iframe id="frame" title="Site do projeto"></iframe>
+  </main>
+  <script type="module" src="preview.js"></script>
+</body>
+</html>

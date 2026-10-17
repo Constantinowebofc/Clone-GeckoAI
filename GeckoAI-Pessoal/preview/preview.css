@@ -1,0 +1,55 @@
+/* Preview do GeckoAI — moldura escura, site em destaque. */
+:root {
+  --bg: #0a0a0b; --surface: #111113; --border: #26262b;
+  --text: #ededef; --muted: #9b9ba3; --accent: #2fbf71;
+  --ok: #3ecf8e; --warn: #f5b14c; --err: #f0716a;
+  --font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
+.mono { font-family: ui-monospace, Consolas, monospace; }
+
+.bar {
+  flex: none; display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.ident { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mark { width: 20px; height: 20px; }
+.name { font-weight: 600; white-space: nowrap; }
+.status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.status.ok .dot { background: var(--ok); }
+.status.run .dot { background: var(--warn); animation: pulse 1s infinite alternate; }
+.status.err .dot { background: var(--err); }
+@keyframes pulse { to { opacity: 0.3; } }
+.addr {
+  flex: 1; text-align: center; font-size: 12px; color: var(--muted);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+  padding: 5px 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tools { display: flex; gap: 4px; }
+.tools button, .tools a {
+  font: inherit; color: var(--text); background: none; border: none; cursor: pointer;
+  padding: 6px 9px; border-radius: 8px; text-decoration: none; font-size: 14px;
+}
+.tools button:hover, .tools a:hover { background: var(--border); }
+
+.stage { flex: 1; display: flex; justify-content: center; padding: 0; overflow: hidden; }
+#frame { width: 100%; height: 100%; border: none; background: #fff; }
+.stage.mobile { padding: 16px; }
+.stage.mobile #frame {
+  width: 390px; border: 1px solid var(--border); border-radius: 18px;
+}
+.empty { align-self: center; text-align: center; color: var(--muted); padding: 40px; }
+.empty .sub { font-size: 13px; margin-top: 8px; color: var(--muted); }
+
+/* Celular: a tela já é um celular — a moldura de 390px não cabe nem faz
+   sentido, e o botão de alternar some. */
+@media (max-width: 600px) {
+  .stage.mobile { padding: 0; }
+  .stage.mobile #frame { width: 100%; border: none; border-radius: 0; }
+  #btn-device { display: none; }
+  .addr { display: none; }
+}

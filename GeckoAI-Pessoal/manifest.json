@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "name": "Gecko Pessoal — API própria",
+  "version": "1.12.1",
+  "description": "Assistente pessoal para seus projetos: API de IA própria, GitHub, Supabase e Vercel.",
+  "minimum_chrome_version": "114",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "sidePanel",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://api.github.com/*",
+    "https://api.supabase.com/*",
+    "https://api.vercel.com/*",
+    "https://lovable.dev/*",
+    "https://www.lovable.dev/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://*.githubusercontent.com https://secure.gravatar.com; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; frame-src https:; base-uri 'none'; form-action 'none'"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/panel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://lovable.dev/*",
+        "https://www.lovable.dev/*"
+      ],
+      "js": [
+        "nativo/guarda.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://lovable.dev/*",
+        "https://www.lovable.dev/*"
+      ],
+      "js": [
+        "nativo/conteudo.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sidepanel/panel.html",
+        "lib/nativo.js",
+        "lib/marca.js",
+        "icons/icon48.png"
+      ],
+      "matches": [
+        "https://lovable.dev/*",
+        "https://www.lovable.dev/*"
+      ],
+      "use_dynamic_url": true
+    }
+  ],
+  "action": {
+    "default_title": "Abrir Gecko Pessoal"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

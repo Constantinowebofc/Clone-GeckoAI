@@ -1,0 +1,355 @@
+/* ===== Chat nativo (1.11.0) =====
+   O painel dentro da página da Lovable (panel.html?nativo=1), com a cara do
+   chat DELA — pedido do dono: "o chat da Lovable aparentemente fica igual, só
+   aparece o gecko". Tudo aqui vale só sob body.nativo; o painel lateral não
+   muda. Carregado depois do marca.css: no chat nativo quem manda é a Lovable,
+   não a marca (a marca aparece no gecko e nos textos).
+
+   Cores medidas na Lovable real (2026-09-30, claro e escuro): fundo da coluna
+   #f5f5f5 / #1d1d1c, campo e balões #fff / #272726, anel
+   rgba(119,119,113,.16), texto quase preto / #f5f5f4. O fundo exato da
+   página chega do content script em --nat-fundo-pagina. A fonte da Lovable
+   ("Camera Plain") não carrega aqui: a pilha cai na do sistema, como a
+   própria Lovable faz sem ela. */
+
+body.nativo {
+  --nat-fundo: #f5f5f5;
+  --nat-sup: #ffffff;
+  --nat-sup-2: #fafafa;
+  --nat-texto: #161616;
+  --nat-texto-2: #6b6b69;
+  --nat-anel: rgba(119, 119, 113, 0.16);
+  --nat-botao: rgba(255, 255, 255, 0.8);
+  --nat-enviar: rgba(0, 0, 0, 0.88);
+  --nat-enviar-texto: #fbfbfb;
+  --nat-enviar-vazio: #dfdfdf;
+  --nat-passar: rgba(0, 0, 0, 0.05);
+
+  /* Os tokens do painel apontam para a paleta da Lovable: banners, cartões
+     e botões que já existem ficam coerentes sem regra própria. */
+  --bg: var(--nat-fundo-pagina, var(--nat-fundo));
+  --surface: var(--nat-sup);
+  --surface-2: var(--nat-sup-2);
+  --surface-3: var(--nat-sup-2);
+  --border: rgba(0, 0, 0, 0.12);
+  --border-soft: rgba(0, 0, 0, 0.07);
+  --text: var(--nat-texto);
+  --muted: var(--nat-texto-2);
+  --faint: #8d8d8a;
+  --accent: var(--nat-texto);
+  --accent-2: var(--nat-texto);
+  --accent-soft: rgba(0, 0, 0, 0.06);
+  --ok: #15803d;
+  --ok-soft: rgba(21, 128, 61, 0.08);
+  --warn: #a16207;
+  --err: #dc2626;
+  --err-soft: rgba(220, 38, 38, 0.07);
+  --plan: #2563eb;
+  --db: #7c3aed;
+  --grad: var(--nat-enviar);
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius: 16px;
+  --radius-sm: 12px;
+
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--nat-texto);
+  background: var(--nat-fundo-pagina, var(--nat-fundo));
+}
+
+body.nativo.nat-escuro {
+  --nat-fundo: #1d1d1c;
+  --nat-sup: #272726;
+  --nat-sup-2: #212120;
+  --nat-texto: #f5f5f4;
+  --nat-texto-2: #a3a3a0;
+  --nat-anel: rgba(255, 255, 255, 0.08);
+  --nat-botao: rgba(137, 137, 130, 0.16);
+  --nat-enviar: rgba(255, 255, 255, 0.96);
+  --nat-enviar-texto: #1f1f1d;
+  --nat-enviar-vazio: #30302e;
+  --nat-passar: rgba(255, 255, 255, 0.06);
+
+  --border: rgba(255, 255, 255, 0.12);
+  --border-soft: rgba(255, 255, 255, 0.07);
+  --faint: #8a8a86;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --ok: #4ade80;
+  --ok-soft: rgba(74, 222, 128, 0.1);
+  --warn: #fbbf24;
+  --err: #f87171;
+  --err-soft: rgba(248, 113, 113, 0.1);
+  --plan: #60a5fa;
+  --db: #a78bfa;
+}
+
+/* ---- O que o chat da Lovable não tem ---- */
+body.nativo .topbar,
+body.nativo #license-bar,
+body.nativo .project-bar,
+body.nativo #context-banner,
+body.nativo #composer-ia,
+body.nativo #btn-remove-logo,
+body.nativo .run-mode-chip { display: none !important; }
+
+/* ---- Conversa ---- */
+body.nativo .thread {
+  padding: 12px 16px 12px;
+  gap: 16px;
+}
+
+/* Balão do usuário: à direita, branco, cantos 24/24/4/24 (medido). */
+body.nativo .msg-user {
+  max-width: 80%;
+  background: var(--nat-sup);
+  border: 0;
+  border-radius: 24px 24px 4px 24px;
+  padding: 12px 16px;
+  box-shadow: 0 0 0 1px var(--nat-anel);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+/* Resposta: texto solto na coluna, como a do agente da Lovable. */
+body.nativo .run,
+body.nativo .run.run-plan {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0 2px;
+  box-shadow: none;
+}
+
+body.nativo .run-status {
+  color: var(--nat-texto-2);
+  font-size: 14px;
+}
+body.nativo .run-status .spin {
+  border-color: var(--nat-anel);
+  border-top-color: var(--nat-texto-2);
+}
+
+/* Etapas dobradas numa linha cinza ("12 etapas ›"), como a atividade da Lovable. */
+body.nativo .tl-dobra { margin: 2px 0 6px; }
+body.nativo .tl-rotulo {
+  list-style: none;
+  cursor: pointer;
+  color: var(--nat-texto-2);
+  font-size: 14px;
+  user-select: none;
+}
+body.nativo .tl-rotulo::-webkit-details-marker { display: none; }
+body.nativo .tl-rotulo::after { content: ' ›'; }
+body.nativo .tl-dobra[open] .tl-rotulo::after { content: ' ⌄'; }
+body.nativo .timeline { margin: 6px 0 0; }
+body.nativo .tl-item { color: var(--nat-texto-2); font-size: 12.5px; }
+
+body.nativo .run-summary {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--nat-texto);
+}
+
+/* Cartões (alteração enviada, banco, partes, não terminei): superfície da Lovable. */
+body.nativo .commit-card,
+body.nativo .migration-card,
+body.nativo .run-error {
+  background: var(--nat-sup);
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--nat-anel);
+}
+body.nativo .run-error { color: var(--err); }
+body.nativo .commit-head { color: var(--nat-texto); }
+body.nativo .commit-head svg { color: var(--ok); }
+body.nativo .mig-head { color: var(--nat-texto); }
+
+body.nativo .lovable-banner {
+  margin: 8px 12px 0;
+  background: var(--nat-sup);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--nat-anel);
+}
+body.nativo .lovable-banner strong { color: var(--nat-texto); }
+
+/* ---- Campo: a cápsula branca de cantos 26 px da Lovable ----
+   Mesma caixa do campo dela (até 768 px, centrado, 8 px das bordas): é o que
+   põe a vaga do "+" exatamente em cima do botão da Lovable. */
+body.nativo .composer {
+  width: calc(min(100%, 768px) - 16px);
+  margin: 0 auto 8px;
+  padding: 12px;
+  border: 0;
+  border-radius: 26px;
+  background: var(--nat-sup);
+  box-shadow:
+    0 0 0 1px var(--nat-anel),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+}
+body.nativo .composer:focus-within {
+  border: 0;
+  box-shadow:
+    0 0 0 1px rgba(119, 119, 113, 0.32),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+}
+body.nativo .composer textarea {
+  font-size: 16px;
+  line-height: 24px;
+  min-height: 28px;
+  color: var(--nat-texto);
+  padding: 0 4px;
+}
+body.nativo .composer textarea::placeholder { color: var(--nat-texto-2); }
+body.nativo .composer-row { gap: 6px; }
+
+/* Botões redondos de 28 px, como os da Lovable. Anexar é o CLIPE: o "+" é o
+   da própria Lovable, visto pelo furo do quadro na vaga abaixo. */
+body.nativo .attach-btn {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nat-botao);
+  box-shadow: 0 0 0 1px var(--nat-anel);
+  color: var(--nat-texto);
+}
+body.nativo .attach-btn:hover { background: var(--nat-passar); color: var(--nat-texto); }
+body.nativo .attach-btn svg { width: 15px; height: 15px; }
+body.nativo .vaga-lovable {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+/* Modo: só a pílula do modo atual ("Construir ⌄"); clicar alterna. */
+body.nativo .mode-toggle {
+  margin-left: auto;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: transparent;
+}
+body.nativo .mode-btn:not(.active) { display: none; }
+body.nativo .mode-btn.active,
+body.nativo .mode-btn.active[data-mode='build'],
+body.nativo .mode-btn.active[data-mode='plan'] {
+  padding: 4px 8px 4px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--nat-texto);
+  font-size: 14px;
+  font-weight: 500;
+}
+body.nativo .mode-btn.active:hover { background: var(--nat-passar); }
+body.nativo .mode-btn svg { display: none; }
+body.nativo .mode-btn.active::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+body.nativo .mode-btn.active[data-mode='plan'] { color: var(--plan); }
+
+body.nativo .composer-actions { margin-left: 0; gap: 6px; }
+
+/* Enviar: círculo escuro com a seta; cinza com o campo vazio. */
+body.nativo .btn-send,
+body.nativo .composer.mode-plan .btn-send {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nat-enviar);
+  color: var(--nat-enviar-texto);
+  box-shadow: none;
+}
+body.nativo .composer:has(textarea:placeholder-shown) .btn-send { background: var(--nat-enviar-vazio); }
+body.nativo .btn-send svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.nativo .btn-send:disabled { opacity: 0.4; }
+
+body.nativo #btn-cancel {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--nat-botao);
+  box-shadow: 0 0 0 1px var(--nat-anel);
+  color: var(--nat-texto);
+  font-size: 13px;
+}
+
+/* ---- Resto ---- */
+/* Aviso acima do campo (no lugar de cobri-lo) e na largura da coluna: com a
+   pílula do painel, um aviso longo virava uma "bola" estreita. */
+body.nativo .toast {
+  bottom: 112px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  border-radius: 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  background: var(--nat-sup);
+  border: 0;
+  box-shadow: 0 0 0 1px var(--nat-anel), 0 8px 24px rgba(0, 0, 0, 0.12);
+  color: var(--nat-texto);
+}
+
+body.nativo ::-webkit-scrollbar { width: 6px; }
+body.nativo ::-webkit-scrollbar-thumb { background: var(--nat-anel); }
+
+/* Sem a extensão configurada: o recado e o botão do painel. */
+.nativo-config {
+  margin: auto;
+  padding: 24px;
+  max-width: 300px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.nativo-config-texto { color: var(--muted); }
+#view-nativo-config:not([hidden]) { display: flex; }
+
+/* A ordem dos botões do campo da Lovable: + (dela) · clipe … Construir ⌄ · microfone · enviar. */
+body.nativo .vaga-lovable { order: -1; }
+body.nativo #btn-attach { order: 0; }
+body.nativo .mode-toggle { order: 1; }
+body.nativo #btn-mic { order: 2; }
+body.nativo .composer-actions { order: 3; }
+
+/* "Criar projeto do zero" é coisa do painel, não de um projeto da Lovable. */
+body.nativo #btn-new-project { display: none !important; }
+
+/* Ditado (pedido do dono): o mesmo microfone do painel, no lugar do da
+   Lovable. Aqui a autorização é a da Lovable (lovable.dev) — o Chrome pede
+   uma vez, e quem já usa o microfone dela nem vê o pedido. */
+body.nativo .mic-btn.gravando,
+body.nativo .mic-btn.gravando:hover {
+  color: var(--err);
+  background: var(--err-soft);
+  box-shadow: 0 0 0 1px var(--err);
+}
+
+/* Fila (1.11): discreta, como as sugestões acima do campo da Lovable. */
+body.nativo .fila { border-bottom-color: var(--nat-anel); }
+body.nativo .fila-item { background: var(--nat-sup-2); box-shadow: 0 0 0 1px var(--nat-anel); font-size: 13px; }
+body.nativo .fila-titulo { color: var(--nat-texto-2); }

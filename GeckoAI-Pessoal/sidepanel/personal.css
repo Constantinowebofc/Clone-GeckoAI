@@ -1,0 +1,7 @@
+.personal-token-dialog { width: min(90vw, 440px); padding: 22px; border: 1px solid #9bc34a; border-radius: 16px; background: #202b15; color: #eef5e1; }
+.personal-token-dialog::backdrop { background: #0009; }
+.personal-token-dialog form { display: grid; gap: 14px; }
+.personal-token-dialog h2, .personal-token-dialog p { margin: 0; }
+.personal-token-dialog p { font-size: 13px; line-height: 1.5; }
+.personal-token-dialog input { width: 100%; padding: 10px; box-sizing: border-box; color: #eef5e1; background: #101509; border: 1px solid #819e48; border-radius: 8px; }
+.personal-token-dialog a { color: #b7e554; }

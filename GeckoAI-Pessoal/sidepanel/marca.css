@@ -1,0 +1,4 @@
+/* White label: folha da MARCA. Vazia no GeckoAI (o visual dele é o próprio
+   panel.css). O build-extension.ps1 põe aqui o marcas/<id>/tema.css da marca
+   escolhida, que só SOBRESCREVE tokens e as poucas regras com cor fixa.
+   Carregada depois de panel.css, preview.css e do <style> do microfone. */

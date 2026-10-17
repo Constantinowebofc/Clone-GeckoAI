@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <!-- interactive-widget=resizes-content: no celular o teclado virtual ENCOLHE a
+       página em vez de cobrir o compositor — sem isso o campo de texto some atrás
+       do teclado. viewport-fit=cover: o painel chega até as bordas em tela com
+       recorte (o CSS repõe a área segura). No PC os dois são ignorados. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <title>GeckoAI</title>
+  <!-- A Geist vem do PRÓPRIO pacote (sidepanel/fonts/), não do Google: o painel
+       não faz uma requisição sequer para fora dos 4 hosts do manifest. Vindo do
+       Google, abrir o painel entregava o IP do cliente a ele, e a fonte sumia
+       para quem estivesse offline ou atrás de firewall. Detalhes em fonts.css. -->
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="panel.css" />
+  <!-- White label: vazio no GeckoAI; no pacote de outra marca, sobrescreve os
+       tokens de cor do panel.css. Tem de vir DEPOIS dele. -->
+  <link rel="stylesheet" href="marca.css" />
+  <!-- Chat nativo (1.11.0): só vale com ?nativo=1 (regras sob body.nativo) —
+       o painel dentro da página da Lovable, com a cara do chat dela. -->
+  <link rel="stylesheet" href="nativo.css" />
+<link rel="stylesheet" href="personal.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-mark" src="../icons/icon32.png" alt="" />
+      <span class="brand-name" data-marca>GeckoAI</span>
+    </div>
+    <div class="pipeline" id="pipeline" title="Fluxo: GitHub → IA → Lovable">
+      <span class="pipe-node">GitHub</span>
+      <span class="pipe-sep">›</span>
+      <span class="pipe-node pipe-ia">IA</span>
+      <span class="pipe-sep">›</span>
+      <span class="pipe-node">Lovable</span>
+    </div>
+    <button class="icon-btn" id="btn-theme" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
+      <svg class="ico-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4" stroke-linecap="round"/></svg>
+      <svg class="ico-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" title="Configurações" aria-label="Configurações">
+      <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7.4-3.5a5.9 5.9 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.3 7.3 0 0 0-1.9-1.1L14.6 3h-4L10 5.8c-.7.3-1.3.6-1.9 1.1l-2.4-1-2 3.4 2 1.6a6 6 0 0 0 0 2.2l-2 1.6 2 3.4 2.4-1c.6.5 1.2.8 1.9 1.1l.4 2.8h4l.4-2.8c.7-.3 1.3-.6 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"/></svg>
+    </button>
+  </header>
+
+  <div class="license-bar" id="license-bar" hidden>
+    <span class="lic-dot"></span>
+    <span class="lic-text" id="license-text"></span>
+    <!-- Selos à direita, separados da chave: o modelo premium com o uso de hoje
+         (v1.8.0) e o ChatGPT do cliente (v1.6.0). -->
+    <span class="lic-selos">
+      <span class="lic-chatgpt lic-premium" id="license-premium" hidden></span>
+      <span class="lic-chatgpt" id="license-chatgpt" hidden></span>
+    </span>
+  </div>
+
+  <!-- Aviso de atualização. Fica fora das views: vale em qualquer tela. -->
+  <div class="update-bar" id="update-bar" hidden></div>
+
+  <main id="views">
+    <!-- Carregando -->
+    <section class="view" id="view-loading">
+      <div class="center-box"><div class="spinner"></div></div>
+    </section>
+
+    <!-- Chat nativo sem a extensão configurada: a configuração é no painel. -->
+    <section class="view" id="view-nativo-config" hidden>
+      <div class="nativo-config">
+        <p class="nativo-config-texto">
+          Para usar o chat nativo, termine de configurar o <span data-marca>GeckoAI</span> no painel
+          (chave de acesso e GitHub).
+        </p>
+        <button class="btn-primary" id="btn-nativo-painel" type="button">Abrir o painel</button>
+      </div>
+    </section>
+
+    <!-- Boas-vindas / chaves -->
+    <section class="view" id="view-setup" hidden>
+      <div class="setup">
+        <h1 class="setup-title">Seu projeto Lovable,<br />editado por prompts.</h1>
+        <p class="setup-sub">
+          Conecte sua API de IA e seu GitHub com credenciais próprias. Cada prompt vira um commit — e o Lovable sincroniza sozinho.
+        </p>
+
+        <div class="field">
+          <label for="in-ai">Chave da API de IA</label>
+          <input id="in-ai" type="password" spellcheck="false"
+                 placeholder="sua chave de API" autocomplete="off" />
+          <p class="field-hint">
+            Use sua chave da OpenAI ou de uma API compatível. Ela fica neste navegador e é enviada apenas à API escolhida. Para Ollama local, deixe em branco.
+          </p>
+        </div>
+
+        <div id="personal-setup-ai"></div>
+        <div class="form-error" id="setup-error" hidden></div>
+        <button class="btn-primary" id="btn-connect">Conectar API</button>
+
+        <div class="field" id="setup-github" hidden>
+          <label>Conta do GitHub</label>
+          <p class="field-hint">
+            Conecte um token pessoal do GitHub limitado aos seus repositórios. Nenhum servidor intermediário é usado.
+          </p>
+          <button class="btn-primary" id="btn-oauth-github">Conectar GitHub</button>
+          <p class="field-hint" id="setup-github-status" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Escolha de projeto -->
+    <section class="view" id="view-repos" hidden>
+      <div class="repos">
+        <button class="repos-back" id="btn-back-repos" hidden>
+          <svg viewBox="0 0 24 24"><path d="M19 12H5m6-7-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Voltar ao projeto
+        </button>
+        <div class="account" id="account-chip"></div>
+        <h2 class="section-title">Escolha o projeto</h2>
+        <p class="section-sub">Selecione o repositório que está conectado ao seu projeto no Lovable.</p>
+        <button class="btn-new-project" id="btn-new-project">
+          <span><span class="np-plus">+</span> Criar projeto do zero</span>
+          <span class="np-sub">repositório novo, site publicado, sem Lovable</span>
+        </button>
+        <input class="search" id="repo-search" type="search" placeholder="Buscar repositório…" />
+        <div class="repo-list" id="repo-list" role="list"></div>
+      </div>
+    </section>
+
+    <!-- Chat -->
+    <section class="view view-chat" id="view-chat" hidden>
+      <div class="project-bar">
+        <div class="project-tools">
+          <select class="branch-select" id="branch-select" title="Branch"></select>
+          <span class="db-chip" id="db-chip" hidden
+            title="Banco Supabase conectado — a IA pode alterar o banco de dados deste projeto">
+            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.8"/><path d="M5 5.5v13c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-13M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></svg>
+          </span>
+          <div class="bar-actions">
+            <!-- Chat nativo: o painel fecha e o chat do GeckoAI aparece no
+                 lugar do chat da Lovable. Só no PC (no celular não há painel). -->
+            <button class="btn-nativo" id="btn-nativo" type="button" hidden
+              title="Usar pelo chat da Lovable: o painel fecha e você digita direto lá">
+              Chat nativo
+            </button>
+            <!-- Skills (1.12): instruções de especialista instaladas no projeto.
+                 Botão com NOME, não só ícone: usuário novo não descobria que
+                 existia (pedido do dono depois do 1º teste). -->
+            <button class="btn-skills" id="btn-skills" type="button"
+              title="Skills: design, SEO, textos, conversão, segurança, performance e mais">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9L12 3.5Z" stroke-linejoin="round"/><path d="M18.5 16v4m-2-2h4" stroke-linecap="round"/></svg>
+              Skills
+            </button>
+            <button class="icon-btn subtle" id="btn-preview" title="Preview do site" aria-label="Preview do site">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M9 21h6"/></svg>
+            </button>
+            <button class="icon-btn subtle" id="btn-context" title="Contexto do projeto (analisar e salvar)" aria-label="Contexto do projeto">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="icon-btn subtle" id="btn-clear-chat" title="Limpar conversa" aria-label="Limpar conversa">
+              <svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2m-6 4v6m4-6v6M7 7l1 13h8l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="conn-stack">
+          <button class="conn-line github" id="btn-change-repo" title="Trocar de projeto">
+            <span class="conn-dot"></span>
+            <span class="conn-label">GitHub</span>
+            <strong id="project-name">projeto</strong>
+          </button>
+          <div class="conn-lines" id="conn-lines" hidden></div>
+        </div>
+      </div>
+
+      <div class="lovable-banner" id="lovable-banner" hidden></div>
+      <div class="lovable-banner" id="context-banner" hidden></div>
+
+      <div class="thread" id="thread">
+      </div>
+
+      <div class="composer">
+        <!-- Fila (1.11): até 2 pedidos esperando o que está rodando terminar. -->
+        <div class="fila" id="fila" hidden></div>
+        <div class="attachments" id="attachments" hidden></div>
+        <textarea id="prompt-input" rows="1"
+          placeholder="Descreva a mudança no seu projeto…"></textarea>
+        <input id="file-input" type="file" multiple hidden />
+        <!-- Seletor de IA: linha própria, acima dos botões (na linha dos botões
+             era cortada no painel estreito e empurrava o Enviar para fora da
+             tela). Só aparece com o catálogo de modelos do servidor (1.9) ou o
+             ChatGPT do cliente conectado (1.6). A lista abre para cima. -->
+        <div class="composer-ia" id="composer-ia" hidden>
+          <div class="ia-campo">
+            <span class="ia-rotulo">IA</span>
+            <button type="button" class="ia-picker" id="ia-picker" aria-haspopup="listbox" aria-expanded="false"></button>
+          </div>
+          <div class="ia-menu" id="ia-menu" role="listbox" aria-label="Modelos de IA" hidden></div>
+          <label class="ia-campo ia-nivel" id="effort-campo" hidden>
+            <span class="ia-rotulo">Raciocínio</span>
+            <select id="effort-select" class="model-select effort-select" title="Raciocínio"></select>
+          </label>
+        </div>
+        <div class="composer-row">
+          <!-- Chat nativo: a vaga do "+" da Lovable (o furo do quadro mostra o
+               botão dela aqui). Fora do chat nativo, sempre escondida. -->
+          <span class="vaga-lovable" id="vaga-lovable" hidden aria-hidden="true"></span>
+          <button class="attach-btn" id="btn-attach" type="button"
+            title="Anexar arquivo: imagem para a IA ver, ou qualquer arquivo (foto, PDF, vídeo…) para colocar no projeto (ou arraste, ou Ctrl+V)" aria-label="Anexar">
+            <svg viewBox="0 0 24 24"><path d="M21 11.5 12 20.5a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.5 3.5 0 0 1 5 5l-8.5 8.5a1.5 1.5 0 0 1-2.2-2.1l7.8-7.9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="attach-btn mic-btn" id="btn-mic" type="button" hidden
+            title="Ditar: fale e o texto aparece no campo (o reconhecimento é do próprio navegador)" aria-label="Ditar por voz">
+            <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Zm7 9a7 7 0 0 1-14 0m7 7v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="mode-toggle" id="mode-toggle" role="radiogroup" aria-label="Modo">
+            <button class="mode-btn" data-mode="plan"
+              title="Plan: a IA analisa e propõe um plano — nada é alterado">
+              <svg viewBox="0 0 24 24"><path d="M9 4h9a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H9M9 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h3M9 4v16m4-11h3m-3 4h3"/></svg>
+              Plan
+            </button>
+            <button class="mode-btn" data-mode="build"
+              title="Build: a IA aplica as mudanças e faz o commit">
+              <svg viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2Z" stroke-linejoin="round"/></svg>
+              Build
+            </button>
+          </div>
+          <button class="logo-btn" id="btn-remove-logo" type="button"
+            aria-label="Remover logo do Lovable">
+            <svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2m-6 4v6m4-6v6M7 7l1 13h8l1-13"/></svg>
+          </button>
+          <div class="composer-actions">
+            <button class="btn-ghost" id="btn-cancel" hidden>Cancelar</button>
+            <button class="btn-primary btn-send" id="btn-send">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Configurações -->
+  <div class="overlay" id="settings-overlay" hidden>
+    <div class="sheet" role="dialog" aria-label="Configurações">
+      <div class="sheet-head">
+        <button class="icon-btn" id="btn-back-settings" title="Voltar" aria-label="Voltar ao início">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5m6-7-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h2>Configurações</h2>
+        <button class="icon-btn" id="btn-close-settings" aria-label="Fechar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div id="settings-keys"></div>
+      <p class="license-status" id="settings-license" hidden></p>
+      <p class="field-hint" style="margin: -6px 0 14px">
+        Esta edição usa sua API diretamente. A cobrança é feita pelo provedor, conforme seu plano. Não é necessária uma licença do GeckoAI original.
+      </p>
+      <div class="field">
+        <label>Conexões</label>
+        <div class="conn-lines" id="settings-connections"></div>
+        <p class="field-hint">
+          GitHub conecta seus repositórios. Supabase e Vercel são opcionais. Cada serviço usa seu próprio token pessoal, salvo somente nesta instalação.
+        </p>
+      </div>
+      <div class="form-error" id="settings-error" hidden></div>
+      <button class="btn-primary" id="btn-save-settings">Salvar</button>
+      <button class="btn-danger" id="btn-disconnect">Desconectar e apagar tudo</button>
+      <p class="sheet-foot">
+        Chaves de API, tokens e histórico ficam neste navegador
+        (<span class="mono">chrome.storage.local</span>). Nada é enviado a
+        serviços além da API de IA escolhida e das integrações que você conectar.
+        Com o seu ChatGPT conectado, os pedidos vão direto deste navegador para a OpenAI.
+      </p>
+    </div>
+  </div>
+
+  <!-- Skills (1.12): instalar no projeto e aplicar -->
+  <div class="overlay" id="skills-overlay" hidden>
+    <div class="sheet" role="dialog" aria-label="Skills">
+      <div class="sheet-head">
+        <h2>Skills</h2>
+        <button class="icon-btn" id="btn-close-skills" aria-label="Fechar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="skills-intro">
+        Instruções de especialista que ficam dentro do seu projeto. Depois de
+        instalada, a IA segue a skill sozinha nos pedidos daquele tema.
+      </p>
+      <!-- Todas / Instaladas: só aparece com alguma skill instalada. -->
+      <div class="skills-filtro" id="skills-filtro" role="tablist" aria-label="Filtrar skills" hidden></div>
+      <div class="skills-list" id="skills-list"></div>
+      <p class="sheet-foot">
+        As skills ficam na pasta <span class="mono">.agents/skills</span> do seu
+        repositório e não mudam nada no site. São guias públicos e muito usados,
+        adaptados para projetos da Lovable; a licença de cada um vai junto.
+      </p>
+    </div>
+  </div>
+
+  <!-- Sincronizar schema do banco (Lovable Cloud) -->
+  <div class="overlay" id="schema-overlay" hidden>
+    <div class="sheet" role="dialog" aria-label="Sincronizar schema">
+      <div class="sheet-head">
+        <h2>Sincronizar schema</h2>
+        <button class="icon-btn" id="btn-close-schema" aria-label="Fechar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="field-hint" style="margin-bottom: 12px">
+        Isto dá à IA o retrato real do seu banco no Lovable Cloud. É só leitura
+        (<span class="mono">SELECT</span>) — não altera nada.
+      </p>
+      <ol class="schema-steps">
+        <li>Copie o SQL e rode no editor de SQL do Lovable.</li>
+        <li>Clique em <strong>Export CSV</strong> lá no Lovable (não precisa abrir o arquivo).</li>
+        <li>Envie o arquivo aqui — eu guardo em <span class="mono">docs/DB_SCHEMA.json</span>.</li>
+      </ol>
+      <button class="lb-btn schema-copy" id="btn-schema-copy">Copiar SQL + abrir editor</button>
+      <details class="schema-sql-details">
+        <summary>Ver o SQL</summary>
+        <pre class="mig-sql" id="schema-sql"></pre>
+      </details>
+      <input id="schema-file" type="file" accept=".csv,.json,.txt,.tsv" hidden />
+      <button class="lb-btn schema-file-btn" id="btn-schema-file">📄 Enviar arquivo CSV exportado</button>
+      <div class="schema-or"><span>ou cole o conteúdo</span></div>
+      <div class="field">
+        <label for="schema-paste">Resultado do SQL (JSON ou CSV)</label>
+        <textarea id="schema-paste" rows="4"
+          placeholder="Cole aqui o JSON, ou o conteúdo do CSV exportado…"></textarea>
+      </div>
+      <p class="form-error" id="schema-error" hidden></p>
+      <button class="btn-primary" id="btn-schema-save">Salvar schema</button>
+    </div>
+  </div>
+
+  <!-- Conectar o preview (Vercel) -->
+  <div class="overlay" id="preview-overlay" hidden>
+    <div class="sheet" role="dialog" aria-label="Conectar preview">
+      <div class="sheet-head">
+        <h2>Conectar o preview</h2>
+        <button class="icon-btn" id="btn-close-preview" aria-label="Fechar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="field-hint" style="margin-bottom:12px">
+        O preview mostra o site publicado deste repositório. Publique na Vercel
+        (1 clique abaixo) e depois conecte por aqui.
+      </p>
+      <a class="lb-btn" id="pv-import" target="_blank" rel="noreferrer" style="display:block;text-align:center;margin-bottom:10px">Publicar na Vercel (1 clique)</a>
+      <button class="lb-btn" id="pv-detect" style="width:100%;margin-bottom:14px">Detectar pela minha conta da Vercel</button>
+      <div class="field">
+        <label for="pv-url">Ou cole a URL do site</label>
+        <input id="pv-url" type="url" placeholder="https://meu-site.vercel.app" spellcheck="false" />
+      </div>
+      <p class="form-error" id="pv-error" hidden></p>
+      <button class="btn-primary" id="btn-save-preview">Conectar</button>
+    </div>
+  </div>
+
+  <!-- Criar projeto do zero -->
+  <div class="overlay" id="new-overlay" hidden>
+    <div class="sheet" role="dialog" aria-label="Criar projeto do zero">
+      <div class="sheet-head">
+        <h2>Criar projeto do zero</h2>
+        <button class="icon-btn" id="btn-close-new" aria-label="Fechar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div id="new-form">
+        <div class="field">
+          <label for="new-name">Nome do projeto</label>
+          <input id="new-name" type="text" spellcheck="false"
+                 placeholder="meu-site" autocomplete="off" />
+          <p class="field-hint">Vira o nome do repositório no GitHub (letras minúsculas e hífens).</p>
+        </div>
+        <label class="mig-check" style="margin-bottom:14px">
+          <input id="new-private" type="checkbox" checked />
+          <span>Repositório privado</span>
+        </label>
+        <div class="field" id="new-db-field" hidden>
+          <label for="new-db">Banco de dados (Supabase)</label>
+          <select id="new-db"></select>
+          <select id="new-db-org" hidden></select>
+          <p class="field-hint">Opcional — dá para vincular depois pelo banner no chat.</p>
+        </div>
+        <p class="field-hint" id="new-vercel-hint"></p>
+        <p class="form-error" id="new-error" hidden></p>
+        <button class="btn-primary" id="btn-create-project">Criar projeto</button>
+      </div>
+      <ol class="new-steps" id="new-steps" hidden>
+        <li data-step="repo">Criar o repositório no GitHub</li>
+        <li data-step="files">Enviar o projeto inicial (Vite + React + Tailwind)</li>
+        <li data-step="db" hidden>Preparar o banco (Supabase)</li>
+        <li data-step="vercel" hidden>Ligar a hospedagem (Vercel)</li>
+      </ol>
+      <div id="new-done" hidden></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

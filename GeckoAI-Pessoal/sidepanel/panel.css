@@ -1,0 +1,3061 @@
+/* ===== GeckoAI — design system =====
+   Dark clean, acento verde-gecko sobre grafite azulado.
+   Tipografia: Geist / Geist Mono, embutidas no pacote (sidepanel/fonts.css) —
+   nenhuma fonte vem de host externo. O resto do empilhamento abaixo é rede de
+   segurança, para o caso de um .woff2 faltar no pacote. */
+
+/* ---- Pele 3 (padrão): Escuro neon ----
+   Mora no :root porque o tema escuro é o estado sem classe. As peles Claro e
+   Gecko sobrescrevem estes tokens. Aqui o relevo não vem de parede clara e sim
+   de LUZ DE BORDA: a peça é preta e o que a recorta do vazio é o fio lime
+   aceso na quina, como no render. */
+:root {
+  --bg: #070905;
+  --surface: #1d2614;
+  --surface-2: #28331c;
+  --surface-3: #334224;
+  --border: #3d5029;
+  --border-soft: #26311a;
+  /* Textos claros e pouco oliva: no print anterior o oliva apagado sumia
+     dentro da própria superfície. */
+  --text: #f4faea;
+  --muted: #c8dcae;
+  --faint: #9bb181;
+  --accent: #b4f03d;
+  --accent-2: #d2ff70;
+  --accent-soft: rgba(180, 240, 61, 0.16);
+  --ok: #9bec36;
+  --ok-soft: rgba(155, 236, 54, 0.16);
+  --warn: #f0c05a;
+  --err: #f68b84;
+  --err-soft: rgba(246, 139, 132, 0.16);
+  --plan: #7fd9e8;
+  --db: #c8a4ff;
+  --grad: linear-gradient(135deg, #a5e830, #c6f84e);
+  --font: 'Geist', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'Cascadia Code', 'Segoe UI Mono', Consolas, monospace;
+  --radius: 22px;
+  --radius-sm: 16px;
+
+  /* Dois limes distintos: o de TINTA (preenchimento, texto) e o de LUZ (só as
+     quinas). Usar o mesmo para os dois fazia o aro virar musgo em vez de luz —
+     numa quina neon a luz é sempre bem mais clara que a tinta difusa.
+     Ficam só dentro dos tokens que cada pele redeclara; usá-los direto numa
+     regra `body.relevo` vazaria lime para o Claro e o Gecko. */
+  --r-lime: 180, 240, 61;
+  --r-rim: 216, 255, 140;
+
+  /* O vazio e a laje: preto puro, com rastros de luz lime */
+  --r-void: #000000;
+  --r-glow:
+    radial-gradient(320px 260px at 96% 0%, rgba(165, 232, 48, 0.3), transparent 68%),
+    radial-gradient(360px 300px at -4% 92%, rgba(165, 232, 48, 0.26), transparent 68%),
+    radial-gradient(180px 150px at 74% 100%, rgba(198, 248, 78, 0.2), transparent 70%);
+  /* Os três planos precisam de degraus de valor bem separados, senão viram uma
+     massa oliva só: a laje ACIMA do vazio, o poço claramente ABAIXO da laje,
+     e os cartões acima dela de novo. */
+  --r-slab: linear-gradient(165deg, #202918 0%, #151b10 45%, #18200f 100%);
+  /* Espessura por LUZ, não por sombra: um vão preto e um segundo fio aceso
+     7px abaixo — é assim que um render neon mostra a face de baixo. Degrau
+     "mais escuro" não existe sobre preto. */
+  --r-slab-shadow:
+    inset 0 2px 0 rgba(var(--r-rim), 0.4),
+    inset 0 0 0 1px rgba(var(--r-rim), 0.62),
+    0 6px 0 #000000,
+    0 7px 0 1px rgba(var(--r-rim), 0.32),
+    0 22px 34px rgba(0, 0, 0, 0.95),
+    0 0 26px rgba(var(--r-lime), 0.3);
+  --r-well: linear-gradient(180deg, #050703, #0a0e06);
+  --r-well-shadow:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.26),
+    inset 0 6px 18px rgba(0, 0, 0, 0.9),
+    inset 0 -2px 0 rgba(var(--r-rim), 0.18);
+
+  /* Peças erguidas: escuras, recortadas pelo fio de luz */
+  --r-scute: linear-gradient(180deg, #2a3520, #1d2614);
+  --r-scute-hi: linear-gradient(180deg, #384727, #29341c);
+  --r-gloss:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.45),
+    inset 0 1px 0 rgba(var(--r-rim), 0.5);
+  /* Mesma receita das lajes: vão preto + fio aceso deslocado. O fio do degrau
+     é sempre mais fraco que o fio da face, senão a face de baixo não recua.
+     Sem halo aqui de propósito — o --r-wall-sm atende 21 seletores e, com
+     brilho, uma tela de repositórios acenderia ~16 focos ao mesmo tempo. */
+  --r-wall:
+    0 3px 0 #000000,
+    0 5px 0 1px rgba(var(--r-rim), 0.26),
+    0 9px 0 2px rgba(var(--r-rim), 0.12),
+    0 20px 26px rgba(0, 0, 0, 0.92);
+  --r-wall-sm:
+    0 2px 0 #000000,
+    0 3px 0 1px rgba(var(--r-rim), 0.24),
+    0 10px 14px rgba(0, 0, 0, 0.9);
+  --r-wall-tall:
+    0 4px 0 #000000,
+    0 7px 0 1px rgba(var(--r-rim), 0.3),
+    0 12px 0 2px rgba(var(--r-rim), 0.16),
+    0 26px 32px rgba(0, 0, 0, 0.95);
+  --r-wall-press:
+    0 1px 0 #000000,
+    0 2px 0 1px rgba(var(--r-rim), 0.18),
+    0 4px 8px rgba(0, 0, 0, 0.8);
+
+  /* Campos cavados */
+  --r-input: linear-gradient(180deg, #070a04, #0d1108);
+  --r-input-shadow:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.32),
+    inset 0 3px 8px rgba(0, 0, 0, 0.85);
+  --r-ph: rgba(226, 248, 190, 0.6);
+  --r-ring: rgba(180, 240, 61, 0.7);
+
+  /* Teclas: escuras com aro aceso — o ponto mais luminoso da tela */
+  --r-key: linear-gradient(180deg, #24300f, #080d03);
+  --r-key-text: #d9ff75;
+  /* A tecla é o ÚNICO foco luminoso forte da tela — é ela que deve puxar o
+     olho, e é por isso que os cartões abriram mão do halo. */
+  --r-key-wall:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.75),
+    0 3px 0 #000000,
+    0 5px 0 1px rgba(var(--r-rim), 0.4),
+    0 16px 22px rgba(0, 0, 0, 0.85),
+    0 0 26px rgba(var(--r-lime), 0.45);
+  --r-key-press:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.75),
+    0 1px 0 #000000,
+    0 2px 0 1px rgba(var(--r-rim), 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.7);
+  --r-key-gloss: linear-gradient(180deg, rgba(var(--r-rim), 0.22), transparent);
+  --r-tile-wall:
+    0 2px 0 #000000,
+    0 3px 0 1px rgba(var(--r-rim), 0.35),
+    0 8px 14px rgba(0, 0, 0, 0.8);
+
+  /* Trilho Plan/Build */
+  --r-track: #060a03;
+  --r-track-shadow: inset 0 0 0 1px rgba(var(--r-rim), 0.34), inset 0 2px 5px rgba(0, 0, 0, 0.85);
+  --r-mode-off: rgba(226, 248, 190, 0.85);
+  --r-mode-off-hi: #eaffbc;
+  --r-mode-on: linear-gradient(180deg, #d2ff70, #aee43a);
+  --r-mode-on-text: #0d1502;
+
+  /* Sobreposições e miudezas */
+  --r-lic: rgba(var(--r-lime), 0.12);
+  --r-lic-shadow: inset 0 0 0 1px rgba(var(--r-rim), 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  --r-overlay: rgba(0, 0, 0, 0.72);
+  --r-sheet: linear-gradient(180deg, #2a3520, #1a2212 30%);
+  --r-sheet-head: #2a3520;
+  --r-sheet-shadow:
+    inset 0 0 0 1px rgba(var(--r-rim), 0.32),
+    0 -10px 40px rgba(0, 0, 0, 0.85);
+  --r-hair: rgba(var(--r-rim), 0.35);
+  --r-dot-ring: rgba(var(--r-rim), 0.5);
+  --r-scroll: rgba(180, 240, 61, 0.4);
+  --r-scroll-hi: rgba(180, 240, 61, 0.6);
+  --r-pulse: 180, 240, 61;
+  --r-ghost-bg: rgba(180, 240, 61, 0.1);
+}
+
+/* ===== Tema claro =====
+   Mesmas variáveis, valores invertidos. O body ganha .light e tudo segue. */
+body.light {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --surface-3: #e6e8ec;
+  --border: #d8dbe1;
+  --border-soft: #e7e9ed;
+  --text: #191a1c;
+  --muted: #5c6068;
+  --faint: #969aa3;
+  --accent: #1d9e5b;
+  --accent-2: #22b268;
+  --accent-soft: rgba(29, 158, 91, 0.1);
+  --ok: #178f5d;
+  --ok-soft: rgba(23, 143, 93, 0.1);
+  --warn: #a8700f;
+  --err: #cc3f38;
+  --err-soft: rgba(204, 63, 56, 0.08);
+  --plan: #2563eb;
+  --db: #6d4fd0;
+  --grad: linear-gradient(135deg, #1d9e5b, #2fbf71);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* O atributo hidden vence qualquer display definido por classe. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.mono { font-family: var(--mono); font-size: 0.92em; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===== Topbar ===== */
+
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--bg) 88%, black);
+}
+
+/* Faixa de validade da licença (abaixo do topo) */
+.license-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+.license-bar .lic-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+.license-bar.ok .lic-dot { background: var(--ok); }
+.license-bar.warn {
+  color: var(--warn);
+  background: rgba(245, 177, 76, 0.08);
+}
+.license-bar.warn .lic-dot { background: var(--warn); }
+.license-bar.bad {
+  color: var(--err);
+  background: var(--err-soft);
+}
+.license-bar.bad .lic-dot { background: var(--err); }
+/* Selo do ChatGPT do cliente (v1.6.0): na mesma linha da chave, mas à direita
+   e com cor própria — "71 prompts · ChatGPT 3%" colados pareciam uma coisa só
+   (pedido do dono). O laranja dele fala do limite da assinatura, não da chave. */
+/* Os selos (premium e ChatGPT) vão juntos à direita. */
+.license-bar .lic-selos {
+  margin-left: auto;
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+.license-bar .lic-chatgpt {
+  flex: none;
+  padding: 2px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.license-bar .lic-chatgpt.quase {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+
+/* Aviso de atualização (lib/versao.js). Laranja avisa; vermelho já travou o
+   envio, então não tem como dispensar. */
+.update-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warn);
+  background: rgba(245, 177, 76, 0.1);
+  border-bottom: 1px solid var(--border-soft);
+}
+.update-bar.obrigatoria {
+  color: var(--err);
+  background: var(--err-soft);
+}
+.update-bar .upd-text { flex: 1 1 180px; }
+.update-bar .upd-link {
+  flex: none;
+  padding: 5px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #1b1200;
+  background: var(--warn);
+}
+.update-bar.obrigatoria .upd-link {
+  color: #fff;
+  background: var(--err);
+}
+.update-bar .upd-later {
+  flex: none;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  opacity: 0.75;
+  cursor: pointer;
+}
+.update-bar .upd-later:hover { opacity: 1; }
+
+/* Linha de validade nas Configurações */
+.license-status {
+  margin: -4px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ok);
+}
+.license-status::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.license-status.warn { color: var(--warn); }
+.license-status.bad { color: var(--err); }
+
+.brand { display: flex; align-items: center; gap: 8px; }
+
+.brand-mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  display: block;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: 0.01em;
+}
+
+.pipeline {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  user-select: none;
+}
+.pipe-sep { opacity: 0.5; }
+.pipe-ia {
+  padding: 1px 6px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+body.running .pipe-ia {
+  color: #fff;
+  border-color: transparent;
+  background: var(--grad);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 191, 113, 0.45); }
+  50% { box-shadow: 0 0 0 5px rgba(47, 191, 113, 0); }
+}
+
+.icon-btn {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+.icon-btn.subtle { color: var(--faint); }
+
+/* Alternador de tema: sol no escuro (leva ao claro), lua no claro */
+#btn-theme .ico-moon { display: none; }
+body.light #btn-theme .ico-sun { display: none; }
+body.light #btn-theme .ico-moon { display: block; }
+/* A topbar e o toast do tema claro são definidos na seção de relevo (fim do
+   arquivo), junto com o resto da cena 3D. */
+
+/* ===== Views ===== */
+
+#views { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.view { flex: 1; min-height: 0; overflow-y: auto; }
+.view[hidden] { display: none; }
+
+.center-box { height: 100%; display: grid; place-items: center; }
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Setup ===== */
+
+.setup { padding: 34px 22px 28px; max-width: 420px; margin: 0 auto; }
+
+.setup-title {
+  font-size: 23px;
+  line-height: 1.22;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, var(--text) 55%, var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.setup-sub { color: var(--muted); margin-bottom: 26px; }
+
+.field { margin-bottom: 18px; }
+
+.field label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.field input, .search, textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  padding: 9px 11px;
+  transition: border-color 0.15s;
+}
+.field input { font-family: var(--mono); font-size: 12.5px; }
+.field input:focus, .search:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.field input::placeholder, .search::placeholder, textarea::placeholder {
+  color: var(--faint);
+}
+
+.field-hint { font-size: 11.5px; color: var(--faint); margin-top: 6px; }
+
+/* Escolha do provedor de IA */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.seg-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 9px 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.seg-btn small {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--faint);
+  letter-spacing: 0.03em;
+}
+.seg-btn:hover { border-color: var(--faint); color: var(--text); }
+.seg-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+.seg-btn.active small { color: var(--accent); }
+.field-hint code {
+  font-family: var(--mono);
+  background: var(--surface-2);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+/* Botão dentro da caixa de erro: a chave está presa em outro computador e
+   este é o único caminho de saída — precisa parecer ação, não aviso. */
+.btn-transfer {
+  display: block;   /* inline-block sentava na linha de base e desalinhava */
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 13px;
+  color: #06120c;
+  background: var(--grad);
+}
+.btn-transfer:disabled { opacity: 0.6; cursor: default; }
+
+.form-error {
+  color: var(--err);
+  background: var(--err-soft);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+/* Caixa que carrega um botão dentro (conflito de dispositivo). O botão é 3D
+   no tema relevo — a sombra desce ~8px — e com o padding normal ele vazava
+   para fora da borda vermelha. Mais respiro embaixo resolve. */
+.form-error.com-acao { padding: 10px 11px 14px; }
+
+.btn-primary {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--grad);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: filter 0.15s, transform 0.1s;
+}
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.55; cursor: default; filter: none; }
+
+.btn-ghost {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 500;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--faint); }
+
+.btn-danger {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--err) 35%, transparent);
+  color: var(--err);
+  font-weight: 500;
+}
+.btn-danger:hover { background: var(--err-soft); }
+
+/* ===== Repositórios ===== */
+
+.repos { padding: 20px 16px 24px; }
+
+/* Volta da escolha de projeto para o chat (só aparece se já há projeto aberto) */
+.repos-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 5px 12px 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  transition: border-color 0.15s, color 0.15s;
+}
+.repos-back:hover { border-color: var(--accent); color: var(--text); }
+.repos-back svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+  margin-bottom: 20px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.account img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.account strong { color: var(--text); font-weight: 600; }
+
+.section-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.section-sub { color: var(--muted); font-size: 12.5px; margin: 4px 0 14px; }
+
+.search { margin-bottom: 12px; }
+
+.repo-list { display: flex; flex-direction: column; gap: 8px; }
+
+.repo-item {
+  text-align: left;
+  padding: 11px 13px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.repo-item:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+.repo-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.badge-lovable {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 1.5px 7px;
+  border-radius: 99px;
+}
+
+.badge-private {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border: 1px solid var(--border);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.repo-desc {
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.repo-meta { color: var(--faint); font-size: 11px; }
+
+.repo-empty { color: var(--faint); text-align: center; padding: 30px 0; }
+
+/* ===== Chat ===== */
+
+.view-chat { display: flex; flex-direction: column; overflow: hidden; }
+
+/* Ferramentas em cima; embaixo, as conexões (GitHub, Vercel, Supabase) no
+   mesmo padrão: bolinha + rótulo + nome, uma linha abaixo da outra. */
+.project-bar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.project-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.branch-select, .model-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 8px;
+  max-width: 140px;
+}
+.branch-select:focus, .model-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.project-bar .bar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.db-chip {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--db) 35%, transparent);
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--db);
+  cursor: help;
+}
+.db-chip svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+.db-chip.warn {
+  border-color: color-mix(in srgb, var(--warn) 42%, transparent);
+  background: rgba(245, 177, 76, 0.1);
+  color: var(--warn);
+  cursor: pointer;
+}
+.db-chip.manual { cursor: pointer; }
+.db-chip.manual:hover { background: rgba(167, 139, 250, 0.18); }
+
+/* Linhas de conexão: com quem o projeto está ligado (Vercel, Supabase, Lovable Cloud) */
+.conn-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.conn-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.conn-line .conn-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.conn-line.github .conn-dot { background: var(--accent); }
+.conn-line.vercel .conn-dot { background: var(--text); }
+.conn-line.supabase .conn-dot { background: var(--ok); }
+.conn-line.lovable .conn-dot { background: var(--db); }
+
+/* A linha do GitHub é um botão (trocar de projeto), mas veste o mesmo padrão. */
+button.conn-line {
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 6px;
+  text-align: left;
+  transition: background 0.15s;
+}
+button.conn-line:hover { background: var(--surface-2); }
+button.conn-line:hover strong { color: var(--text); }
+.conn-line .conn-label { flex: none; }
+.conn-line strong {
+  font-weight: 600;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sufixo da linha (ex.: "· sincronizado há 3 dias"). Discreto por padrão;
+   em `alerta` chama atenção — é o sinal de que o retrato do banco envelheceu
+   e a IA está lendo um schema desatualizado. */
+.conn-line .conn-extra {
+  flex: none;
+  color: var(--faint);
+  font-size: 11px;
+}
+.conn-line .conn-extra.alerta { color: var(--warn); }
+
+/* ===== Lista de conexões das Configurações =====
+   Um cartão com uma linha por serviço. NÃO reaproveita `.conn-line` (que é a
+   lista de conexões do chat, minúscula) nem `.btn-primary` como ação: aquele
+   botão tem `width:100%` e, dentro de uma linha flex, exigia a largura toda —
+   era o que espremia "Supabase: não conectado" em duas linhas e reduzia o
+   campo de token da Vercel a uma tira. Ação de linha usa `.conn-acao`. */
+
+.conn-itens {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.conn-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.conn-item + .conn-item { border-top: 1px solid var(--border-soft); }
+
+.conn-item-info {
+  flex: 1;
+  min-width: 0;          /* deixa o texto truncar em vez de empurrar o botão */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.conn-item-nome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.conn-item-nome::before {          /* bolinha de estado */
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+.conn-item.ligado .conn-item-nome::before { background: var(--ok); }
+.conn-item-status {
+  font-size: 11.5px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ação compacta: largura pelo conteúdo, nunca 100%. */
+.conn-acao {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  /* Fundo próprio além da borda: no tema claro e no gecko a --border quase
+     encosta na --surface do cartão, e só com borda o botão sumia — virava
+     texto solto. Com o fundo ele se lê como botão nos três temas. */
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.conn-acao:hover { color: var(--text); border-color: var(--faint); background: var(--surface-3); }
+.conn-acao.principal {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.conn-acao.principal:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.conn-acao:disabled { opacity: 0.55; cursor: default; }
+
+/* Vercel desconectada: a linha cresce para caber campo de token e link. */
+.conn-item.com-token { flex-direction: column; align-items: stretch; gap: 8px; }
+.conn-token-linha {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.conn-token-linha input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 9px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.conn-token-linha input::placeholder { color: var(--faint); }
+.conn-token-linha input:focus-visible { outline: none; border-color: var(--accent); }
+.conn-token-link {
+  align-self: flex-start;
+  font-size: 11.5px;
+  color: var(--accent);
+}
+.conn-token-link:hover { text-decoration: underline; }
+
+/* Banner de sincronização com a aba do Lovable */
+/* X de fechar, no canto do banner */
+.lb-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--faint);
+  opacity: 0.75;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+.lb-close:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  opacity: 1;
+}
+.lb-close svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.lovable-banner {
+  position: relative;
+  flex: none;
+  margin: 10px 12px 0;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 12.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lovable-banner.info {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+.lovable-banner.warn {
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  background: rgba(245, 177, 76, 0.1);
+}
+.lovable-banner.db-manual {
+  border: 1px solid color-mix(in srgb, var(--db) 38%, transparent);
+  background: rgba(167, 139, 250, 0.09);
+}
+.lovable-banner.db-manual strong { color: var(--db); }
+.lovable-banner.db-manual .lb-btn:hover { border-color: var(--db); }
+.lovable-banner.context {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: var(--accent-soft);
+}
+.lovable-banner.context strong { color: var(--accent); }
+.lovable-banner.context .lb-btn:hover { border-color: var(--accent); }
+.lovable-banner .lb-spin {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.lovable-banner strong { color: var(--warn); font-size: 12.5px; }
+.lb-sub { color: var(--muted); margin-top: 3px; }
+.lb-actions { display: flex; gap: 8px; }
+.lb-btn {
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.lb-btn:hover { border-color: var(--warn); }
+/* Ação secundária do banner: mesma forma, peso menor. Usada no painel do
+   Lovable Cloud para o "Conectar Supabase", que é a saída caso o usuário
+   tenha declarado o modo manual por engano — não pode competir com a ação
+   principal, mas também não pode sumir. */
+.lb-btn.ghost {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 500;
+}
+.lb-btn.ghost:hover { color: var(--text); border-color: var(--faint); }
+.lb-select {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11.5px;
+}
+.lb-select:disabled { color: var(--muted); }
+
+.thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+/* Mensagem do usuário */
+.msg-user {
+  align-self: flex-end;
+  max-width: 85%;
+  background: var(--surface-3);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px 16px 4px 16px;
+  padding: 10px 14px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Bloco de execução do agente */
+.run {
+  align-self: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.run-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.run-status .spin {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Linha do tempo do agente — assinatura visual */
+.timeline {
+  margin: 10px 0 2px;
+  padding-left: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.tl-item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 3px 0 3px 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--border);
+}
+.tl-item:first-child::before { top: 50%; }
+.tl-item:last-child::before { bottom: 50%; }
+.tl-item:only-child::before { display: none; }
+.tl-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  border: 1.5px solid var(--faint);
+}
+.tl-item.op-read::after { border-color: var(--faint); }
+.tl-item.op-edit::after, .tl-item.op-write::after, .tl-item.op-create::after {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.tl-item.op-delete::after { border-color: var(--err); background: var(--err-soft); }
+.tl-item.op-commit::after { border-color: var(--ok); background: var(--ok-soft); }
+.tl-item.op-sql::after { border-color: var(--db); background: rgba(167, 139, 250, 0.12); }
+.tl-item.op-migration::after { border-color: var(--db); background: rgba(167, 139, 250, 0.12); }
+.tl-item.op-search::after { border-color: var(--faint); }
+.tl-item.op-dbread::after { border-color: var(--db); }
+
+.tl-verb { flex: none; font-weight: 500; color: var(--faint); font-size: 11px; }
+.tl-item.op-edit .tl-verb, .tl-item.op-write .tl-verb, .tl-item.op-create .tl-verb { color: var(--accent); }
+.tl-item.op-delete .tl-verb { color: var(--err); }
+.tl-item.op-sql .tl-verb { color: var(--db); }
+.tl-item.op-migration .tl-verb { color: var(--db); }
+.tl-item.op-dbread .tl-verb { color: var(--db); }
+.tl-path {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+/* Resumo da IA */
+.run-summary {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Cartão de commit */
+.commit-card {
+  margin-top: 12px;
+  border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent);
+  background: var(--ok-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.commit-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--ok);
+}
+.commit-head svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+/* Desfazer último prompt: seta discreta à direita do cabeçalho do commit. */
+.btn-undo {
+  margin-left: auto;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.btn-undo:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+.btn-undo:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn-undo svg { width: 14px; height: 14px; }
+.commit-undo-wait {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  font-weight: 500;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.commit-undo-cancel {
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+}
+.commit-undone {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.commit-undone.err { color: var(--err); }
+.commit-msg { margin-top: 4px; font-size: 12.5px; }
+.commit-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.commit-meta a { font-family: var(--mono); font-size: 11px; }
+.sync-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.sync-note .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.run-error {
+  margin-top: 10px;
+  color: var(--err);
+  background: var(--err-soft);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  font-size: 12.5px;
+}
+
+.run-cancelled { margin-top: 10px; color: var(--faint); font-size: 12.5px; font-style: italic; }
+
+/* Cartão de handoff da migração (Lovable Cloud) */
+.migration-card {
+  margin-top: 12px;
+  border: 1px solid color-mix(in srgb, var(--db) 35%, transparent);
+  background: rgba(167, 139, 250, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+}
+.mig-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--db);
+}
+.mig-ico { font-size: 14px; }
+.mig-hint { margin-top: 5px; font-size: 12px; color: var(--muted); }
+/* O resumo em português que a IA escreve para o leigo: é o que ele lê. */
+.mig-resumo { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--text); }
+.mig-detalhes { margin-top: 6px; }
+.mig-detalhes > summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.mig-detalhes > summary:hover { color: var(--text); }
+.mig-detalhes .mig-sql { margin-top: 6px; }
+.mig-sql {
+  margin-top: 9px;
+  max-height: 230px;
+  overflow: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre;
+}
+.mig-warn {
+  margin-top: 10px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  background: rgba(245, 177, 76, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+}
+.mig-warn strong { color: var(--warn); font-size: 12.5px; }
+.mig-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+.mig-check input { margin-top: 2px; accent-color: var(--warn); }
+.mig-tools { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.mig-actions { display: flex; gap: 8px; margin-top: 10px; }
+.mig-go {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--grad);
+  color: #0d1502;
+  font-weight: 600;
+  transition: filter 0.15s, transform 0.1s;
+}
+.mig-go:hover { filter: brightness(1.08); }
+.mig-go:active { transform: translateY(1px); }
+.mig-go:disabled { opacity: 0.5; cursor: default; filter: none; }
+.mig-cancel {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 500;
+}
+.mig-cancel:hover { color: var(--text); border-color: var(--faint); }
+.mig-cancel:disabled { opacity: 0.5; cursor: default; }
+.mig-msg { margin-top: 10px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 7px; }
+.mig-msg.err {
+  color: var(--err);
+  background: var(--err-soft);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+}
+.mig-errbox {
+  resize: vertical;
+  min-height: 40px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+/* Modal: sincronizar schema */
+.schema-steps {
+  margin: 0 0 12px 18px;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.schema-steps li { padding-left: 2px; }
+.schema-copy { width: 100%; }
+.schema-sql-details { margin-top: 10px; }
+.schema-sql-details summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 0;
+}
+.schema-sql-details summary:hover { color: var(--text); }
+.schema-sql-details .mig-sql { margin-top: 6px; max-height: 180px; }
+.schema-file-btn { width: 100%; margin-top: 12px; font-weight: 600; }
+.schema-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+  color: var(--faint);
+  font-size: 11.5px;
+}
+.schema-or::before,
+.schema-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ===== Composer ===== */
+
+.composer {
+  flex: none;
+  margin: 0 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 10px 12px 12px;
+  background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.composer textarea {
+  resize: none;
+  max-height: 140px;
+  min-height: 40px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  background: transparent;
+  border: none;
+  padding: 2px 2px 0;
+}
+
+.composer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.composer-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn-send { width: auto; padding: 8px 18px; }
+.composer-row .model-select { flex: 0 1 130px; min-width: 64px; }
+/* Linha da IA (ChatGPT do cliente, v1.6.0): acima dos botões, com largura
+   para o nome do modelo aparecer inteiro. Na linha dos botões ela era cortada
+   e empurrava o Enviar para fora do painel (teste do dono, 2026-09-25). */
+.composer-ia {
+  position: relative; /* âncora da lista de modelos, que abre para cima */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 16 px até os botões: com 8 px os botões em relevo pareciam colados nos
+     seletores (pedido do dono, 2026-09-25). */
+  margin: 6px 0 16px;
+}
+.composer-ia .ia-campo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 60%;
+}
+.composer-ia .ia-nivel { flex: 1 1 40%; }
+.composer-ia .ia-rotulo {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.composer-ia .model-select {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  color: var(--text);
+}
+
+/* Seletor de IA (1.9): botão + lista própria, com ícone, descrição e o
+   aviso do modelo bloqueado — o <select> não mostra nada disso. */
+.ia-picker {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  text-align: left;
+}
+.ia-picker:hover,
+.ia-picker[aria-expanded="true"] { border-color: var(--accent); }
+.ia-picker:disabled { opacity: 0.6; cursor: default; }
+.ia-picker .ia-nome {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ia-picker .ia-ico { width: 22px; height: 22px; border-radius: 7px; }
+.ia-picker .ia-ico svg { width: 13px; height: 13px; }
+.ia-seta {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ia-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 30;
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+.ia-grupo {
+  padding: 10px 12px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ia-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 10px;
+  border-radius: 10px;
+  text-align: left;
+  color: var(--text);
+}
+/* Separador fino entre os itens, como na lista de modelos do produto. */
+.ia-item + .ia-item { box-shadow: inset 0 1px 0 var(--border); }
+.ia-item:hover:not(.bloqueado),
+.ia-item:focus-visible { background: var(--surface-2); outline: none; }
+.ia-item.ativo { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.ia-item.bloqueado { cursor: not-allowed; }
+.ia-item.bloqueado .ia-ico,
+.ia-item.bloqueado .ia-item-nome,
+.ia-item.bloqueado .ia-item-desc { opacity: 0.45; }
+.ia-textos {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ia-item-nome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.ia-item-desc { font-size: 12px; color: var(--muted); }
+/* O aviso do bloqueado: toma o lugar da descrição ao passar o mouse (ou ao
+   focar pelo teclado). Dentro do item, e não num balão, para nunca ser
+   cortado pela rolagem da lista. */
+.ia-dica {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.ia-item.bloqueado:hover .ia-item-desc,
+.ia-item.bloqueado:focus-visible .ia-item-desc { display: none; }
+.ia-item.bloqueado:hover .ia-dica,
+.ia-item.bloqueado:focus-visible .ia-dica { display: flex; }
+.ia-cadeado { display: inline-flex; color: var(--muted); }
+.ia-cadeado svg,
+.ia-dica svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ia-cota {
+  flex: none;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.ia-cota.fim { color: var(--warn); border-color: var(--warn); }
+
+/* Ícones pelo nome que o servidor manda; cor fixa por ícone (fora das
+   marcas, como as cores de estado). */
+.ia-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 15%, transparent);
+}
+.ia-ico svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ico-cerebro { color: #c084fc; }
+.ico-codigo { color: #60a5fa; }
+.ico-raio { color: #facc15; }
+.ico-estrela { color: #fb923c; }
+.ico-foguete { color: #f472b6; }
+.ico-chat { color: #34d399; }
+.ico-padrao { color: var(--accent); }
+/* A lista ABERTA: o Chrome desenha o menu com o tema do sistema (fundo
+   branco) e o texto herdava a cor clara do painel — ilegível. Com as cores do
+   tema, a lista acompanha o escuro, o claro e a pele Gecko. */
+.model-select option,
+.model-select optgroup,
+.branch-select option {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* Botão de anexar */
+.attach-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.attach-btn:hover { color: var(--accent); border-color: var(--accent); }
+.attach-btn svg { width: 17px; height: 17px; }
+
+/* Ditado: gravando fica vermelho e pulsando — é o único jeito de o usuário
+   saber que o microfone está aberto sem olhar para a barra do Chrome. */
+.mic-btn.gravando,
+.mic-btn.gravando:hover {
+  color: var(--err);
+  border-color: var(--err);
+  background: var(--err-soft);
+  animation: mic-pulso 1.4s ease-in-out infinite;
+}
+@keyframes mic-pulso {
+  50% { opacity: 0.55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mic-btn.gravando { animation: none; }
+}
+body.relevo .mic-btn.gravando,
+body.relevo .mic-btn.gravando:hover {
+  background: var(--err-soft);
+  border-color: transparent;
+  color: var(--err);
+}
+
+/* Chips de anexos */
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+.attach-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 190px;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+}
+.attach-chip.text { padding-left: 8px; }
+.attach-chip.file { padding-left: 8px; } /* anexo que vai para o projeto (📎 nome · tamanho) */
+.attach-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  object-fit: cover;
+  display: block;
+}
+.attach-ico { font-size: 14px; }
+.attach-name {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-rm {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  color: var(--faint);
+  font-size: 15px;
+  line-height: 1;
+}
+.attach-rm:hover { color: var(--err); background: var(--err-soft); }
+
+/* Anexo mostrado na bolha do usuário */
+.msg-attach {
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* Área de soltar arquivos */
+.view-chat.dragging { position: relative; }
+.view-chat.dragging::after {
+  content: 'Solte para anexar';
+  position: absolute;
+  inset: 8px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--accent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg) 88%);
+  color: var(--accent);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* Modos Plan / Build */
+.mode-toggle {
+  flex: none;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+}
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--faint);
+  transition: all 0.15s;
+}
+.mode-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+.mode-btn:hover { color: var(--muted); }
+.mode-btn.active[data-mode='build'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.mode-btn.active[data-mode='plan'] {
+  background: rgba(96, 165, 250, 0.14);
+  color: var(--plan);
+}
+.mode-toggle.disabled { opacity: 0.55; pointer-events: none; }
+
+/* Botão "Remover logo do Lovable" — só ícone, no formato do botão de anexar */
+.logo-btn {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.logo-btn:hover { color: var(--accent); border-color: var(--accent); }
+/* Rótulo discreto ao lado: só quando o mouse PARA em cima (atraso de 0.35s) */
+.logo-btn::after {
+  content: 'Remover logo Lovable';
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-3);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+  z-index: 5;
+}
+.logo-btn:hover::after { opacity: 1; transition-delay: 0.35s; }
+.logo-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+body.running .logo-btn { opacity: 0.55; pointer-events: none; }
+.composer.mode-plan .btn-send {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+/* Execução em modo Plan */
+.run.run-plan { border-left: 2px solid var(--plan); }
+.run-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--plan);
+  background: rgba(96, 165, 250, 0.12);
+  padding: 2px 9px;
+  border-radius: 99px;
+  margin-bottom: 8px;
+}
+
+/* ===== Overlay / configurações ===== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 10, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  z-index: 50;
+}
+.overlay[hidden] { display: none; }
+
+.sheet {
+  width: 100%;
+  max-height: 94vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-radius: 18px 18px 0 0;
+  padding: 18px 18px 22px;
+  animation: rise 0.22s ease;
+}
+@keyframes rise {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* Fixo no topo: a folha rola, mas o voltar/fechar ficam sempre à vista.
+   O "top" desconta o padding da folha: com 0, o cabeçalho parava 18px abaixo
+   da borda e o conteúdo rolado aparecia nessa fresta, por cima dele. */
+.sheet-head {
+  --cab: var(--surface);
+  position: sticky;
+  top: -18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -18px -18px 16px;
+  padding: 14px 18px 10px;
+  background: var(--cab);
+}
+/* O conteúdo some aos poucos sob o cabeçalho, em vez de ser cortado seco. */
+.sheet-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 14px;
+  background: linear-gradient(var(--cab), transparent);
+  pointer-events: none;
+}
+.sheet-head h2 { flex: 1; font-size: 16px; font-weight: 700; }
+.sheet-foot { margin-top: 14px; font-size: 11px; color: var(--faint); }
+
+/* ===== Skills (1.12) ===== */
+/* Só tokens para o que é da marca; as cores dos ícones são identidade de cada
+   skill (iguais nos três temas e no white label — ver abaixo). */
+
+/* O botão da barra do projeto: com nome e na cor de destaque — só o ícone,
+   usuário novo não via que as skills existiam. */
+.btn-skills {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 4px;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-skills:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--accent);
+}
+.btn-skills svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+}
+
+/* --- A folha --- */
+.skills-intro {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Todas / Instaladas: um seletor de dois lados, com área de toque folgada. */
+.skills-filtro {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.skills-filtro[hidden] { display: none; }
+.skills-aba {
+  flex: 1;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+}
+.skills-aba:hover { color: var(--text); }
+.skills-aba.ativa {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.skills-list { display: flex; flex-direction: column; gap: 22px; }
+.skills-grupo { display: flex; flex-direction: column; gap: 10px; }
+.skills-grupo-nome {
+  padding-left: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+}
+
+/* --- O cartão --- */
+.skill-item {
+  --skill-cor: var(--accent);
+  --skill-cor-2: var(--accent);
+  position: relative;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  transition: border-color 0.15s, background 0.15s;
+}
+.skill-item:hover { border-color: color-mix(in srgb, var(--skill-cor) 55%, var(--border)); }
+.skill-item.instalada {
+  border-color: color-mix(in srgb, var(--skill-cor) 55%, var(--border));
+  background: color-mix(in srgb, var(--skill-cor) 7%, var(--surface-2));
+}
+
+/* A cor de cada skill. É identidade da skill, não da marca: fica igual nos
+   três temas e no white label (nenhuma é o verde do GeckoAI). Tons médios,
+   para o desenho branco se ler por cima em qualquer fundo. Dentro de um mesmo
+   grupo da folha, nenhuma cor é vizinha da outra. */
+.skill-item[data-skill="frontend-design"]                  { --skill-cor: #ec4899; --skill-cor-2: #c026d3; }
+.skill-item[data-skill="web-design-guidelines"]            { --skill-cor: #8b5cf6; --skill-cor-2: #7c3aed; }
+.skill-item[data-skill="seo"]                              { --skill-cor: #3b82f6; --skill-cor-2: #2563eb; }
+.skill-item[data-skill="copywriting"]                      { --skill-cor: #f59e0b; --skill-cor-2: #d97706; }
+.skill-item[data-skill="cro"]                              { --skill-cor: #10b981; --skill-cor-2: #059669; }
+.skill-item[data-skill="signup"]                           { --skill-cor: #06b6d4; --skill-cor-2: #0891b2; }
+.skill-item[data-skill="supabase-security"]                { --skill-cor: #14b8a6; --skill-cor-2: #0d9488; }
+.skill-item[data-skill="supabase-postgres-best-practices"] { --skill-cor: #6366f1; --skill-cor-2: #4f46e5; }
+.skill-item[data-skill="react-best-practices"]             { --skill-cor: #f97316; --skill-cor-2: #ea580c; }
+.skill-item[data-skill="core-web-vitals"]                  { --skill-cor: #ef4444; --skill-cor-2: #dc2626; }
+
+/* Plano sem skills: a lista é vitrine. A faixa diz o motivo, os cartões
+   ficam apagados (o ícone continua colorido) e nenhum tem botão. */
+.skills-trava {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.skills-trava-ico { flex: none; font-size: 15px; }
+.skill-item.travada { cursor: not-allowed; }
+.skill-item.travada:hover { border-color: var(--border); }
+.skill-item.travada .skill-texto { opacity: 0.6; }
+.skill-item.travada .skill-ico { filter: saturate(0.55); opacity: 0.85; }
+.skill-cadeado { font-size: 11px; }
+
+.skill-cab { display: flex; align-items: flex-start; gap: 12px; }
+.skill-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--skill-cor), var(--skill-cor-2));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 5px 14px -5px color-mix(in srgb, var(--skill-cor) 70%, transparent);
+  color: #fff;
+}
+.skill-ico svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.skill-texto { flex: 1; min-width: 0; padding-top: 1px; }
+.skill-topo { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.skill-nome { font-size: 15px; font-weight: 700; letter-spacing: -0.005em; color: var(--text); }
+.skill-selo {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--skill-cor) 20%, transparent);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+.skill-resumo { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+
+/* --- As ações: uma linha própria, na largura do cartão, só com o botão
+   principal ("Remover" é a lixeira do canto, longe do toque errado). --- */
+.skill-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 14px; }
+.skill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, filter 0.15s, transform 0.1s;
+}
+.skill-btn:active:not(:disabled) { transform: translateY(1px); }
+.skill-btn:disabled { opacity: 0.45; cursor: default; }
+/* O botão que está trabalhando continua vivo; os outros é que esperam. */
+.skill-btn.ocupado:disabled { opacity: 1; }
+/* Instalar: a cara do botão de ação do painel (`.mig-go`, que cada tema e
+   cada marca já resolvem) — aqui só o tamanho. */
+.skill-btn.instalar { min-width: 104px; padding-inline: 20px; }
+.skill-btn.usar {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+}
+.skill-btn.usar:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+/* Remover: lixeira no canto do cartão — fora do fluxo, para o texto usar a
+   largura inteira; só a linha do nome deixa espaço para ela. */
+.skill-item.instalada .skill-topo { padding-right: 30px; }
+.skill-remover {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  color: var(--faint);
+  transition: background 0.15s, color 0.15s;
+}
+.skill-remover:hover:not(:disabled) {
+  color: var(--err);
+  background: color-mix(in srgb, var(--err) 12%, transparent);
+}
+.skill-remover:disabled { opacity: 0.45; cursor: default; }
+.skill-remover.ocupado:disabled { opacity: 1; color: var(--muted); }
+.skill-remover svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.skill-btn .spin,
+.skill-remover .spin {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Enquanto confere o que está instalado: cartões-fantasma do tamanho dos de
+   verdade (a folha não pula quando a lista chega). */
+.skill-fantasma {
+  height: 118px;
+  border-color: transparent;
+  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface-3) 50%, var(--surface-2) 70%);
+  background-size: 300% 100%;
+  animation: skill-brilho 1.3s ease-in-out infinite;
+}
+.skill-fantasma:hover { border-color: transparent; }
+@keyframes skill-brilho { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .skill-fantasma, .skill-btn .spin, .skill-remover .spin { animation: none; }
+}
+/* Toque: alvos de 44 px, como o resto do painel no celular. */
+@media (pointer: coarse) {
+  .skill-btn, .skills-aba { min-height: 44px; }
+  .skill-remover { width: 40px; height: 40px; }
+  .skill-btn { font-size: 14px; }
+  .skill-resumo { font-size: 14px; }
+}
+
+/* ===== Toast ===== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 12.5px;
+  z-index: 60;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Scrollbar ===== */
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .thread { scroll-behavior: auto; }
+}
+
+/* ===== Criar projeto do zero ===== */
+
+.btn-new-project {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-weight: 600;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-new-project:hover { border-color: var(--accent); background: var(--surface-2); }
+.btn-new-project .np-plus { color: var(--accent); margin-right: 6px; }
+.btn-new-project .np-sub { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+
+.new-steps { list-style: none; display: grid; gap: 10px; margin: 6px 0 14px; }
+.new-steps li { display: flex; align-items: center; gap: 9px; color: var(--faint); }
+.new-steps li::before {
+  content: '○';
+  font-size: 14px;
+  color: var(--faint);
+}
+.new-steps li.run { color: var(--text); }
+.new-steps li.run::before { content: '◌'; color: var(--accent); animation: spin 1s linear infinite; }
+.new-steps li.ok { color: var(--muted); }
+.new-steps li.ok::before { content: '✓'; color: var(--ok); }
+.new-steps li.warn::before { content: '!'; color: var(--warn); }
+.new-steps li.err { color: var(--err); }
+.new-steps li.err::before { content: '✕'; color: var(--err); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.np-ready { font-weight: 700; color: var(--ok); margin-bottom: 10px; }
+#new-done { display: grid; gap: 10px; }
+#new-done a.lb-btn { text-align: center; }
+
+/* ===== Temas em relevo (Escuro, Claro e Gecko) =====
+   UMA estrutura, TRÊS peles. Tudo que é geometria — a cena de três planos, as
+   paredes, o curso das teclas, a entrada — vive nas regras `body.relevo`, que
+   só leem variáveis `--r-*`. Cada tema declara sua paleta e nada mais. Mexeu
+   na física? Vale para os três. Mexeu na cor? Fica no tema.
+   (A pele Escura mora no `:root`, por ser o tema sem classe.)
+
+   A cena, igual nos três:
+   1. O VAZIO — o fundo atrás de tudo, com brilhos de luz nas quinas.
+   2. A LAJE — o painel inteiro é uma placa arredondada flutuando sobre o
+      vazio (body::before), com espessura e halo.
+   3. O POÇO — o miolo do chat é cavado na laje, liso (textura atrás de texto
+      atrapalha a leitura: testado e rejeitado).
+   Texto escuro nas superfícies, texto lime nas teclas pretas. */
+
+/* ---- Pele 1: Gecko (lime da logo). A pele Escura fica no :root. ---- */
+body.gecko {
+  --ink: #050a01;
+  --bark: #1c2f08;
+  --well: #98d321;
+  --shell: #8ed016;
+  --skin: #a9e435;
+  --lit: #c6f84e;
+  --flash: #e0ff8e;
+
+  --bg: #9ed822;
+  --surface: var(--skin);
+  --surface-2: var(--lit);
+  --surface-3: var(--shell);
+  --border: transparent;
+  --border-soft: transparent;
+  --text: var(--ink);
+  --muted: #0f1c02;
+  --faint: #23390a;
+  --accent: var(--ink);
+  --accent-2: var(--bark);
+  --accent-soft: rgba(5, 10, 1, 0.12);
+  --ok: #17470a;
+  --ok-soft: rgba(23, 71, 10, 0.16);
+  --warn: #5c3f00;
+  --err: #6e150a;
+  --err-soft: rgba(110, 21, 10, 0.14);
+  --plan: #152304;
+  --db: #152304;
+  --grad: linear-gradient(180deg, #152304, #000000);
+  --radius: 22px;
+  --radius-sm: 16px;
+
+  /* O vazio e a laje */
+  --r-void: #081103;
+  --r-glow:
+    radial-gradient(280px 220px at 92% 4%, rgba(140, 220, 40, 0.4), transparent 70%),
+    radial-gradient(320px 260px at 2% 88%, rgba(140, 220, 40, 0.32), transparent 70%),
+    radial-gradient(140px 120px at 70% 96%, rgba(200, 244, 85, 0.18), transparent 70%);
+  --r-slab: linear-gradient(165deg, #d6f776 0%, #b7ea41 34%, #9fd925 68%, #8cc717 100%);
+  --r-slab-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -3px 0 rgba(8, 17, 3, 0.22),
+    0 5px 0 #55840a,
+    0 10px 0 #3a5c05,
+    0 30px 50px rgba(0, 0, 0, 0.7),
+    0 0 80px rgba(140, 220, 40, 0.3);
+  --r-well: linear-gradient(180deg, #90ca1a, var(--well));
+  --r-well-shadow:
+    inset 0 5px 12px rgba(8, 17, 3, 0.32),
+    inset 0 -2px 0 rgba(224, 255, 142, 0.25);
+
+  /* Peças erguidas */
+  --r-scute: linear-gradient(180deg, var(--lit), var(--skin));
+  --r-scute-hi: linear-gradient(180deg, var(--flash), var(--lit));
+  --r-gloss:
+    inset 0 2px 0 rgba(224, 255, 142, 0.6),
+    inset 0 -2px 0 rgba(8, 17, 3, 0.14);
+  --r-wall:
+    0 2px 0 #7cb70e, 0 4px 0 #6aa20b, 0 7px 0 #55880a, 0 11px 0 #3f6805,
+    0 20px 28px rgba(8, 17, 3, 0.5);
+  --r-wall-sm:
+    0 2px 0 #6aa20b, 0 4px 0 #4f7f07, 0 9px 14px rgba(8, 17, 3, 0.45);
+  --r-wall-tall:
+    0 3px 0 #7cb70e, 0 6px 0 #6aa20b, 0 10px 0 #55880a, 0 15px 0 #3f6805,
+    0 26px 34px rgba(13, 26, 4, 0.5);
+  --r-wall-press: 0 1px 0 #4f7f07, 0 3px 6px rgba(13, 26, 4, 0.35);
+
+  /* Campos cavados */
+  --r-input: linear-gradient(180deg, #d9fa85, #c3f05f);
+  --r-input-shadow:
+    inset 0 3px 6px rgba(8, 17, 3, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+  --r-ph: rgba(5, 10, 1, 0.65);
+  --r-ring: rgba(12, 22, 2, 0.5);
+
+  /* Teclas pretas */
+  --r-key: linear-gradient(180deg, #152304, #000000);
+  --r-key-text: #d9ff75;
+  --r-key-wall: 0 3px 0 #000000, 0 6px 0 #000000, 0 16px 22px rgba(0, 0, 0, 0.55);
+  --r-key-press: 0 1px 0 #000000, 0 4px 8px rgba(0, 0, 0, 0.4);
+  --r-key-gloss: linear-gradient(180deg, rgba(228, 255, 156, 0.3), transparent);
+  --r-tile-wall: 0 3px 0 #4f7f07, 0 8px 14px rgba(8, 17, 3, 0.45);
+
+  /* Trilho Plan/Build */
+  --r-track: #000000;
+  --r-track-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7), 0 2px 0 rgba(224, 255, 142, 0.25);
+  --r-mode-off: rgba(217, 255, 117, 0.8);
+  --r-mode-off-hi: #e4ff8e;
+  --r-mode-on: linear-gradient(180deg, var(--flash), var(--lit));
+  --r-mode-on-text: var(--ink);
+
+  /* Sobreposições e miudezas */
+  --r-lic: rgba(12, 22, 2, 0.12);
+  --r-lic-shadow: inset 0 2px 4px rgba(8, 17, 3, 0.28), inset 0 -1px 0 rgba(224, 255, 142, 0.3);
+  --r-overlay: rgba(13, 26, 4, 0.55);
+  --r-sheet: linear-gradient(180deg, var(--flash), var(--skin) 30%);
+  --r-sheet-head: var(--flash);
+  --r-sheet-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.65), 0 -10px 40px rgba(13, 26, 4, 0.55);
+  --r-hair: rgba(5, 10, 1, 0.25);
+  --r-dot-ring: rgba(228, 255, 156, 0.6);
+  --r-scroll: rgba(13, 26, 4, 0.4);
+  --r-scroll-hi: rgba(13, 26, 4, 0.6);
+  --r-pulse: 217, 255, 117;
+  --r-ghost-bg: rgba(255, 255, 255, 0.16);
+}
+
+/* ---- Pele 2: Claro (laje de porcelana, acentos lime) ---- */
+body.light {
+  /* Tintas medidas contra as superfícies REAIS do tema (o poço e os cartões
+     tintados, não só o branco) — todas acima de 4.5:1. */
+  --accent: #326a0e;
+  --accent-2: #41830f;
+  --accent-soft: rgba(50, 106, 14, 0.12);
+  --ok: #2a6f14;
+  --ok-soft: rgba(42, 111, 20, 0.14);
+  --warn: #7d5200;
+  --err: #a82820;
+  --err-soft: rgba(168, 40, 32, 0.1);
+  --text: #10160a;
+  --muted: #333d2b;
+  --faint: #4a5540;
+  --border: transparent;
+  --border-soft: transparent;
+  --grad: linear-gradient(180deg, #1a2410, #000000);
+  --radius: 22px;
+  --radius-sm: 16px;
+
+  /* O vazio e a laje. O vazio precisa ser bem mais escuro que a laje, senão a
+     borda dela se dissolve; o anel de 1px é o que recorta as laterais (os
+     degraus só deslocam no eixo Y e nunca alcançam os lados). */
+  --r-void: #dae3ca;
+  --r-glow:
+    radial-gradient(300px 240px at 94% 2%, rgba(154, 214, 40, 0.45), transparent 70%),
+    radial-gradient(340px 280px at 0% 90%, rgba(154, 214, 40, 0.35), transparent 70%),
+    radial-gradient(150px 130px at 72% 98%, rgba(198, 248, 78, 0.3), transparent 70%);
+  --r-slab: linear-gradient(165deg, #ffffff 0%, #fbfdf7 42%, #f2f7e9 100%);
+  --r-slab-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -3px 0 rgba(96, 116, 70, 0.13),
+    0 0 0 1px rgba(58, 76, 36, 0.1),
+    0 5px 0 #d2ddc0,
+    0 10px 0 #b6c69f,
+    0 22px 34px rgba(46, 62, 28, 0.34),
+    0 0 80px rgba(154, 214, 40, 0.28);
+  --r-well: linear-gradient(180deg, #dde8cb, #edf4e0);
+  --r-well-shadow:
+    inset 0 6px 14px rgba(74, 94, 50, 0.28),
+    inset 0 1px 0 rgba(74, 94, 50, 0.14),
+    inset 0 -2px 0 rgba(255, 255, 255, 0.95);
+
+  /* Peças erguidas. O topo do cartão não é branco puro de propósito: o fio de
+     luz branco precisa ter sobre o que aparecer. */
+  --r-scute: linear-gradient(180deg, #fbfdf6, #eef5e2);
+  --r-scute-hi: linear-gradient(180deg, #ffffff, #eaf6d4);
+  --r-gloss:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(88, 108, 62, 0.1);
+  /* Degraus com contraste real: o 1º passo tinha delta 6 contra a peça
+     (invisível) e deixava o tema inteiro chapado. */
+  --r-wall:
+    0 2px 0 #dde7cc, 0 4px 0 #cbd9b4, 0 7px 0 #b6c79c, 0 11px 0 #9fb381,
+    0 20px 28px rgba(46, 62, 28, 0.28);
+  --r-wall-sm:
+    0 2px 0 #dde7cc, 0 4px 0 #c4d4aa, 0 9px 14px rgba(46, 62, 28, 0.26);
+  --r-wall-tall:
+    0 3px 0 #dde7cc, 0 6px 0 #cbd9b4, 0 10px 0 #b6c79c, 0 15px 0 #9fb381,
+    0 26px 34px rgba(46, 62, 28, 0.32);
+  --r-wall-press: 0 1px 0 #c4d4aa, 0 3px 6px rgba(46, 62, 28, 0.26);
+
+  /* Campos cavados */
+  --r-input: linear-gradient(180deg, #eaf1de, #f8fbf3);
+  --r-input-shadow:
+    inset 0 3px 6px rgba(88, 108, 62, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.95);
+  --r-ph: rgba(16, 22, 10, 0.62);
+  --r-ring: rgba(61, 125, 19, 0.55);
+
+  /* Teclas pretas — o contraponto forte da porcelana. O lime aqui é MAIS claro
+     que o do Gecko: cercada de branco, a vista adapta para cima e um lime
+     fechado pareceria apagado dentro da tecla. */
+  --r-key: linear-gradient(180deg, #16200c, #000000);
+  --r-key-text: #d6ff6e;
+  --r-key-wall: 0 3px 0 #000000, 0 6px 0 #000000, 0 16px 22px rgba(0, 0, 0, 0.32);
+  --r-key-press: 0 1px 0 #000000, 0 4px 8px rgba(0, 0, 0, 0.26);
+  --r-key-gloss: linear-gradient(180deg, rgba(203, 245, 86, 0.22), transparent);
+  --r-tile-wall: 0 3px 0 #c6d4b2, 0 8px 14px rgba(58, 76, 36, 0.3);
+
+  /* Trilho Plan/Build: preto como no render, modo ativo em lime */
+  --r-track: #10160a;
+  --r-track-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 2px 0 rgba(255, 255, 255, 0.85);
+  --r-mode-off: rgba(226, 245, 175, 0.85);
+  --r-mode-off-hi: #eaffb0;
+  --r-mode-on: linear-gradient(180deg, #d3f96a, #b4e831);
+  --r-mode-on-text: #0d1502;
+
+  /* Sobreposições e miudezas */
+  --r-lic: rgba(16, 22, 10, 0.07);
+  --r-lic-shadow: inset 0 2px 4px rgba(88, 108, 62, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.9);
+  --r-overlay: rgba(40, 54, 24, 0.4);
+  --r-sheet: linear-gradient(180deg, #ffffff, #f4f9ec 30%);
+  --r-sheet-head: #ffffff;
+  --r-sheet-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.95), 0 -10px 40px rgba(58, 76, 36, 0.28);
+  --r-hair: rgba(16, 22, 10, 0.16);
+  --r-dot-ring: rgba(255, 255, 255, 0.95);
+  --r-scroll: rgba(58, 76, 36, 0.28);
+  --r-scroll-hi: rgba(58, 76, 36, 0.45);
+  --r-pulse: 122, 190, 30;
+  --r-ghost-bg: rgba(255, 255, 255, 0.7);
+}
+
+/* ---- Estrutura compartilhada ---- */
+
+/* Plano 1 — o vazio */
+body.relevo {
+  padding: 10px;
+  background-color: var(--r-void);
+  background-image: var(--r-glow);
+}
+
+/* Plano 2 — a laje flutuando */
+body.relevo::before {
+  content: '';
+  position: fixed;
+  inset: 10px;
+  z-index: -1;
+  border-radius: 26px;
+  background: var(--r-slab);
+  box-shadow: var(--r-slab-shadow);
+  animation: gecko-rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+@keyframes gecko-rise {
+  from { transform: scale(0.965) translateY(10px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes gecko-pop {
+  0% { transform: scale(1) rotate(0); }
+  40% { transform: scale(1.28) rotate(-10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+/* Entrada: as peças assentam em cascata. `backwards` para o transform final
+   voltar ao normal — com `both` a animação venceria o :focus-within. */
+@keyframes gecko-settle {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+body.relevo .project-bar { animation: gecko-settle 0.42s 0.08s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards; }
+body.relevo .thread { animation: gecko-settle 0.46s 0.14s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards; }
+body.relevo .composer { animation: gecko-settle 0.46s 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards; }
+
+/* Sem sombra em texto nenhum: nitidez máxima */
+body.relevo .setup-title {
+  background: none;
+  -webkit-text-fill-color: var(--text);
+  color: var(--text);
+}
+
+/* Topbar e barras: transparentes — quem aparece é a laje; os controles viram
+   pílulas e ladrilhos erguidos sobre ela */
+body.relevo .topbar {
+  position: relative;
+  z-index: 3;
+  background: transparent;
+  border-bottom: none;
+}
+body.relevo .brand-mark {
+  width: 26px;
+  height: 26px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #000000;
+  box-shadow: inset 0 1px 0 rgba(200, 244, 85, 0.3), var(--r-tile-wall);
+  animation: gecko-pop 0.55s ease;
+}
+body.relevo .license-bar {
+  margin: 0 12px 2px;
+  border-radius: 999px;
+  border-bottom: none;
+  background: var(--r-lic);
+  box-shadow: var(--r-lic-shadow);
+}
+body.relevo .project-bar {
+  background: transparent;
+  border-bottom: none;
+}
+
+/* Plano 3 — o poço: liso de propósito */
+body.relevo .thread {
+  margin: 12px 10px 8px;
+  border-radius: 20px;
+  padding: 18px 16px 14px;
+  background: var(--r-well);
+  box-shadow: var(--r-well-shadow);
+}
+
+/* ---- Espaçamento do relevo ----
+   A parede projeta até 11px sólidos + desfoque abaixo de cada peça. Com os
+   gaps do tema plano (8px), a parede de um bloco invade o de baixo e eles
+   parecem colados. Aqui os vãos são recalculados para caberem a parede E
+   sobrar respiro — vale para as duas peles. */
+body.relevo .lovable-banner { margin: 18px 12px 0; }
+/* Banner colado no poço logo abaixo: a parede precisa de saída */
+body.relevo .lovable-banner + .thread { margin-top: 18px; }
+body.relevo .thread { gap: 20px; }
+body.relevo .repo-list { gap: 14px; }
+body.relevo .attachments { gap: 10px; margin-bottom: 12px; }
+body.relevo .account { margin-bottom: 24px; }
+body.relevo .repos-back { margin-bottom: 20px; }
+body.relevo .btn-new-project { margin-bottom: 18px; }
+body.relevo .composer-row { gap: 10px; }
+/* Só os botões de bloco: no composer o Enviar fica na linha, sem margem */
+body.relevo .btn-primary:not(.btn-send) { margin-bottom: 8px; }
+body.relevo .field { margin-bottom: 22px; }
+
+/* No tema plano o campo do composer é transparente e quem afasta o texto da
+   borda é o padding do próprio composer. Aqui ele virou uma caixa cavada
+   visível, então precisa do respiro dele mesmo. */
+body.relevo .composer textarea {
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+}
+
+/* Peças erguidas: a mesma receita de relevo em todo cartão */
+body.relevo .run,
+body.relevo .repo-item,
+body.relevo .account,
+body.relevo .btn-new-project,
+body.relevo .lovable-banner,
+body.relevo .commit-card,
+body.relevo .msg-user,
+body.relevo .repos-back {
+  background: var(--r-scute);
+  border-color: transparent;
+  box-shadow: var(--r-gloss), var(--r-wall-sm);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+body.relevo .repo-item:hover,
+body.relevo .btn-new-project:hover,
+body.relevo .repos-back:hover {
+  background: var(--r-scute-hi);
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: var(--r-gloss), var(--r-wall);
+}
+body.relevo .msg-user { border-radius: 22px 22px 8px 22px; }
+
+/* Peças que só existiam pela borda: com --border transparente e fundo igual ao
+   do cartão, sumiam por completo (os botões de ação dos banners e modais —
+   "Sincronizar schema", "Gerar contexto", "Publicar na Vercel"…). Ganham o
+   mesmo relevo das demais para voltar a parecer botão. */
+body.relevo .lb-btn,
+body.relevo .lb-select,
+body.relevo .mig-cancel,
+body.relevo .attach-chip,
+body.relevo .file-pill,
+body.relevo .schema-drop,
+body.relevo .badge-private {
+  background: var(--r-scute-hi);
+  border-color: transparent;
+  color: var(--text);
+  box-shadow: var(--r-gloss), var(--r-wall-sm);
+}
+body.relevo .lb-btn:hover,
+body.relevo .mig-cancel:hover {
+  background: var(--r-scute);
+  border-color: transparent;
+}
+body.relevo .mig-sql {
+  background: var(--r-input);
+  border-color: transparent;
+  box-shadow: var(--r-input-shadow);
+}
+body.relevo .lb-close:hover { background: var(--r-input); }
+
+/* Composer: a peça mais grossa da tela — sobe outro degrau ao focar */
+body.relevo .composer {
+  background: var(--r-scute);
+  border-color: transparent;
+  box-shadow: var(--r-gloss), var(--r-wall);
+  transition: transform 0.16s, box-shadow 0.16s;
+}
+body.relevo .composer:focus-within {
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: var(--r-gloss), var(--r-wall-tall);
+}
+
+/* Campos: cavados — o oposto do relevo dos botões, some a dúvida do que é o quê */
+body.relevo .field input,
+body.relevo .search,
+body.relevo textarea {
+  background: var(--r-input);
+  border-color: transparent;
+  color: var(--text);
+  box-shadow: var(--r-input-shadow);
+}
+body.relevo .field input::placeholder,
+body.relevo .search::placeholder,
+body.relevo textarea::placeholder { color: var(--r-ph); }
+body.relevo .field input:focus,
+body.relevo .search:focus,
+body.relevo textarea:focus {
+  border-color: transparent;
+  box-shadow: var(--r-input-shadow), 0 0 0 3px var(--r-ring);
+}
+
+/* Botão principal: tecla preta com verniz e curso real */
+body.relevo .btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--r-key);
+  color: var(--r-key-text);
+  box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.35), var(--r-key-wall);
+  transition: transform 0.09s, box-shadow 0.09s, filter 0.15s;
+}
+/* Especular fixo: o brilho molhado da logo, não um shimmer animado */
+body.relevo .btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 45%;
+  border-radius: inherit;
+  background: var(--r-key-gloss);
+  pointer-events: none;
+}
+body.relevo .btn-primary:hover { filter: brightness(1.25); }
+body.relevo .btn-primary:active {
+  transform: translateY(5px);
+  box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.35), var(--r-key-press);
+}
+body.relevo .btn-danger { color: var(--err); }
+/* Botões preenchidos com var(--grad) — "Autorizar e rodar", "Já apliquei",
+   "Transferir": esse token é lime CLARO na pele Escura e a tecla PRETA no
+   Claro/Gecko, então NENHUMA cor fixa de texto serve para os três (era
+   exatamente o texto preto sobre botão preto). Recebem a mesma tecla do
+   .btn-primary, que já resolve isso por pele. */
+body.relevo .mig-go,
+body.relevo .btn-transfer {
+  background: var(--r-key);
+  color: var(--r-key-text);
+  box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.35), var(--r-key-wall);
+}
+body.relevo .mig-go:active,
+body.relevo .btn-transfer:active {
+  box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.35), var(--r-key-press);
+}
+/* Em Plan o Enviar é azul por padrão — aqui vira a peça clara: a ação é de
+   leitura, então a tecla preta (aplicar) fica reservada ao Build. */
+body.relevo .composer.mode-plan .btn-send {
+  background: var(--r-scute-hi);
+  color: var(--text);
+  box-shadow: var(--r-gloss), var(--r-wall);
+}
+body.relevo .composer.mode-plan .btn-send::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
+}
+
+/* Botões de ícone: pastilhas redondas que afundam ao toque (como no render) */
+body.relevo .icon-btn,
+body.relevo .attach-btn,
+body.relevo .logo-btn,
+body.relevo .db-chip {
+  border-radius: 50%;
+  background: var(--r-scute);
+  border-color: transparent;
+  color: var(--muted);
+  box-shadow: var(--r-gloss), var(--r-wall-sm);
+  transition: transform 0.09s, box-shadow 0.09s, background 0.15s;
+}
+body.relevo .icon-btn:hover,
+body.relevo .attach-btn:hover,
+body.relevo .logo-btn:hover,
+body.relevo .db-chip:hover {
+  background: var(--r-scute-hi);
+  border-color: transparent;
+  color: var(--text);
+}
+body.relevo .icon-btn:active,
+body.relevo .attach-btn:active,
+body.relevo .logo-btn:active {
+  transform: translateY(3px);
+  box-shadow: var(--r-gloss), var(--r-wall-press);
+}
+/* O alerta âmbar do chip de banco não pode sumir no tema. Fundo leve de
+   propósito: com 18% o ícone âmbar caía abaixo de 4.5:1 contra ele. */
+body.relevo .db-chip.warn {
+  background: rgba(107, 74, 0, 0.1);
+  color: var(--warn);
+}
+/* No modo Plan a tecla clara precisa afundar junto com a própria parede */
+body.relevo .composer.mode-plan .btn-send:active {
+  box-shadow: var(--r-gloss), var(--r-wall-press);
+}
+body.relevo .brand-mark { cursor: pointer; }
+body.relevo .logo-btn::after {
+  background: #000000;
+  border-color: transparent;
+  color: var(--r-key-text);
+}
+
+/* Plan/Build: trilho preto como no render; o modo ativo é a tecla acesa */
+body.relevo .mode-toggle {
+  background: var(--r-track);
+  border-color: transparent;
+  box-shadow: var(--r-track-shadow);
+}
+body.relevo .mode-btn { color: var(--r-mode-off); }
+body.relevo .mode-btn:hover { color: var(--r-mode-off-hi); }
+body.relevo .mode-btn.active[data-mode='build'],
+body.relevo .mode-btn.active[data-mode='plan'] {
+  background: var(--r-mode-on);
+  color: var(--r-mode-on-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 0 #000;
+}
+body.relevo .branch-select,
+body.relevo .model-select,
+body.relevo .ia-picker {
+  background: var(--r-scute);
+  border-color: transparent;
+  color: var(--text);
+  box-shadow: var(--r-gloss), var(--r-wall-sm);
+}
+body.relevo .ia-picker[aria-expanded="true"] { box-shadow: var(--r-gloss), var(--r-wall-sm), 0 0 0 1px var(--accent); }
+
+/* Sobreposições: a folha sobe como uma laje sob luz rasante */
+body.relevo .toast {
+  background: var(--r-key);
+  border-color: transparent;
+  color: var(--r-key-text);
+  box-shadow: var(--r-key-wall);
+}
+body.relevo .overlay { background: var(--r-overlay); }
+body.relevo .sheet {
+  background: var(--r-sheet);
+  border-top-color: transparent;
+  box-shadow: var(--r-sheet-shadow);
+}
+body.relevo .sheet-head { --cab: var(--r-sheet-head); }
+
+/* Miudezas: linha do tempo, pontos e barra de rolagem no mesmo material */
+body.relevo .spinner,
+body.relevo .run-status .spin,
+body.relevo .lb-spin {
+  border-color: var(--r-hair);
+  border-top-color: var(--text);
+}
+/* O trilho e o divisor usam var(--border), que aqui é transparente — repõe */
+body.relevo .tl-item::before { background: var(--r-hair); }
+body.relevo .schema-or::before,
+body.relevo .schema-or::after { background: var(--r-hair); }
+body.relevo .conn-line .conn-dot {
+  box-shadow: 0 0 0 3px var(--r-dot-ring), 0 2px 3px rgba(13, 26, 4, 0.3);
+}
+/* Só o ponto NEUTRO da linha do tempo herda o material do tema. Sem restringir
+   (e com !important), todos os pontos viravam iguais e o código de cor sumia:
+   o vermelho de apagar, o verde de commit e o roxo de SQL. */
+body.relevo .tl-item.op-read::after {
+  background: var(--r-scute);
+  border-color: var(--faint);
+}
+/* Plan continua marcado pela borda: a regra base perdia para o relevo */
+body.relevo .run.run-plan {
+  border-left: 3px solid var(--plan);
+}
+body.relevo .pipe-ia {
+  background: var(--r-track);
+  border-color: transparent;
+  color: var(--r-key-text);
+  box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.3), 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+/* Em execução, o pulse base anima box-shadow com o verde do tema escuro e
+   engoliria o relevo — versão do pulso na paleta, mantendo o fio de luz */
+@keyframes gecko-pulse {
+  0%, 100% {
+    box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.3), 0 0 0 0 rgba(var(--r-pulse), 0.55);
+  }
+  50% {
+    box-shadow: inset 0 1px 0 rgba(217, 255, 117, 0.3), 0 0 0 6px rgba(var(--r-pulse), 0);
+  }
+}
+body.relevo.running .pipe-ia {
+  background: var(--r-track);
+  color: var(--r-key-text);
+  animation-name: gecko-pulse;
+}
+body.relevo .btn-ghost {
+  color: var(--text);
+  border-color: var(--r-hair);
+  background: var(--r-ghost-bg);
+}
+body.relevo .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+body.relevo ::-webkit-scrollbar-thumb {
+  background: var(--r-scroll);
+  border-radius: 99px;
+}
+body.relevo ::-webkit-scrollbar-thumb:hover { background: var(--r-scroll-hi); }
+
+/* ===== Celular (tela de toque) =====
+   Quetta e outros navegadores Android com extensões abrem o painel numa ABA
+   de tela cheia (ver background.js). Tudo abaixo só vale quando o ponteiro
+   principal é o dedo — no PC, mesmo em janela estreita, nada daqui entra.
+   Regras: alvo de toque de 40px ou mais, texto um pouco maior, altura pela
+   viewport DINÂMICA (a barra de endereço do celular some e aparece) e a área
+   segura de tela com recorte. */
+@media (pointer: coarse) {
+  html, body { height: 100dvh; }
+  body {
+    font-size: 14.5px;
+    /* Sem o flash cinza do Android ao tocar, e sem o duplo-toque dar zoom. */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* Rolagem com inércia e sem "puxar para atualizar" recarregando o painel
+     no meio de uma conversa. */
+  .view, .thread, .sheet, .repo-list, .mig-sql { -webkit-overflow-scrolling: touch; }
+  body { overscroll-behavior: none; }
+
+  /* Alvos de toque */
+  .icon-btn, .attach-btn, .logo-btn { width: 40px; height: 40px; }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .attach-btn svg, .logo-btn svg { width: 20px; height: 20px; }
+  .db-chip { width: 32px; height: 32px; }
+  .mode-btn { padding: 8px 13px; font-size: 13px; }
+  .mode-btn svg { width: 14px; height: 14px; }
+  .btn-send { padding: 11px 20px; font-size: 14px; }
+  .btn-ghost { padding: 10px 14px; }
+  .btn-primary, .btn-danger, .lb-btn, .mig-go, .mig-cancel, .btn-transfer,
+  .conn-acao, .schema-copy, .schema-file-btn, .btn-new-project, .repos-back {
+    min-height: 44px;
+  }
+  .btn-skills { min-height: 40px; padding: 6px 14px 6px 11px; font-size: 13px; }
+  .repo-item { padding: 14px 15px; }
+  .attach-rm { width: 26px; height: 26px; }
+  .btn-undo { width: 32px; height: 32px; }
+  .lb-close { width: 32px; height: 32px; }
+  .branch-select, .model-select { padding: 8px 10px; font-size: 13.5px; }
+  .ia-picker { padding: 7px 12px 7px 7px; font-size: 13.5px; }
+  .ia-item { padding: 13px 12px; }
+  .ia-item-nome { font-size: 15px; }
+  .ia-item-desc, .ia-dica { font-size: 13px; }
+  .topbar { padding: 12px 14px calc(12px + env(safe-area-inset-top)); flex-wrap: wrap; }
+
+  /* Campos: 16px evita o zoom automático de alguns navegadores ao focar, e o
+     campo do prompt fica alto o bastante para o polegar acertar. */
+  .field input, .search, textarea { font-size: 16px; padding: 12px 13px; }
+  .composer textarea { min-height: 52px; max-height: 40vh; }
+
+  /* A linha de botões do compositor pode quebrar: anexar, microfone,
+     Plan/Build, logo e Enviar não cabem em 360px numa linha só. O Enviar
+     empurra tudo e fica sempre à direita. */
+  .composer-row { flex-wrap: wrap; row-gap: 8px; }
+  .composer-actions { margin-left: auto; }
+  .composer { margin: 0 8px calc(10px + env(safe-area-inset-bottom)); }
+
+  /* Rótulo do botão de logo só existe para mouse parado em cima; no toque
+     ele "grudava" depois do toque. */
+  .logo-btn::after { display: none; }
+
+  /* Folhas de configuração: até a altura DINÂMICA e com a área segura. */
+  .sheet {
+    max-height: 94dvh;
+    padding-bottom: calc(22px + env(safe-area-inset-bottom));
+  }
+  .toast { bottom: calc(18px + env(safe-area-inset-bottom)); max-width: calc(100% - 32px); text-align: center; }
+
+  /* Mensagens: mais largas numa tela de 360px, o texto fica mais legível. */
+  .msg-user { max-width: 92%; }
+  .thread { padding: 14px 12px 8px; }
+
+  /* Relevo: as pastilhas maiores mantêm a mesma receita; a laje encosta menos
+     nas bordas para não roubar espaço da tela estreita. */
+  body.relevo::before { inset: 6px; border-radius: 20px; }
+  body.relevo .thread { margin: 10px 8px 8px; padding: 14px 12px 12px; }
+}
+
+/* Sem mouse (toque), o :hover fica preso no último elemento tocado. Os
+   deslocamentos de hover viram "salto" após o toque — desligados aqui.
+   Os :active (afundar) continuam, é o feedback que faz sentido no dedo. */
+@media (hover: none) {
+  .repo-item:hover { transform: none; }
+  body.relevo .repo-item:hover,
+  body.relevo .btn-new-project:hover,
+  body.relevo .repos-back:hover { transform: none; }
+  .logo-btn:hover::after { opacity: 0; }
+}
+
+/* ===== Resumo formatado (1.11.0, lib/formatar.js) =====
+   Antes o resumo era texto cru e o cliente lia "**3 tarefas**" com os
+   asteriscos. Os blocos vêm montados com elementos (nunca innerHTML). */
+.run-summary.md { white-space: normal; }
+.run-summary.md p { white-space: pre-wrap; margin: 0 0 8px; }
+.run-summary.md > :last-child { margin-bottom: 0; }
+.run-summary.md strong { font-weight: 650; }
+.run-summary.md .md-titulo { font-weight: 650; margin: 10px 0 4px; }
+.run-summary.md .md-titulo:first-child { margin-top: 0; }
+.run-summary.md ul, .run-summary.md ol { margin: 0 0 8px; padding-left: 20px; }
+.run-summary.md li { margin: 2px 0; }
+.run-summary.md code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  overflow-wrap: anywhere;
+}
+.run-summary.md .md-codigo {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+/* ===== Chat nativo: o botão na barra do projeto (1.11.0) ===== */
+.btn-nativo {
+  flex: none;
+  margin-right: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-nativo:hover { border-color: var(--accent); color: var(--accent); }
+body.running .btn-nativo { opacity: 0.55; pointer-events: none; }
+/* Painel estreito (~360 px): o seletor de branch cede espaço em vez de
+   empurrar os ícones da barra para fora (revisão da 1.11). */
+.project-tools { min-width: 0; }
+.project-tools .branch-select { flex: 0 1 auto; min-width: 56px; }
+.project-bar .bar-actions { flex: none; }
+
+/* ===== Fila de pedidos (1.11.0) =====
+   Até 2 pedidos esperando o que está rodando terminar (lib/fila.js). */
+.fila {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.fila-titulo { font-size: 11px; font-weight: 600; color: var(--muted); }
+.fila-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 12.5px;
+}
+.fila-texto { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fila-modo { flex: none; font-size: 10.5px; font-weight: 600; color: var(--plan); }
+.fila-tirar {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
+}
+.fila-tirar:hover { color: var(--err); background: var(--err-soft); }
+.fila-parada { font-size: 12px; color: var(--warn); margin-top: 2px; }
+.fila-acoes { display: flex; gap: 6px; flex-wrap: wrap; }
